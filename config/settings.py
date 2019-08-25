@@ -28,7 +28,7 @@ INSTALLED_APPS = [
 
 # Project applications
 
-INSTALLED_APPS += ["users.apps.UsersConfig"]
+INSTALLED_APPS += ["users.apps.UsersConfig", "questions.apps.QuestionsConfig"]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -65,6 +65,7 @@ AUTH_USER_MODEL = "users.User"
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
+# fmt: off
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -92,7 +93,7 @@ AUTH_PASSWORD_VALIDATORS = [
         )
     },
 ]
-
+# fmt: on
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
