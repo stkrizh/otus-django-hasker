@@ -38,6 +38,7 @@ class AbstractVote(models.Model):
     class Meta:
         abstract = True
         ordering = ["-timestamp"]
+        unique_together = ["to", "user"]
 
 
 class Answer(AbstractPost):
