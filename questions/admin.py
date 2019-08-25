@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Answer, AnswerVote, Question, QuestionVote
+from .models import Answer, AnswerVote, Question, QuestionVote, Tag
 
 
 @admin.register(Answer)
@@ -20,4 +20,9 @@ class QuestionAdmin(admin.ModelAdmin):
 
 @admin.register(QuestionVote)
 class QuestionVoteAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(Tag)
+class TagAdmin(admin.ModelAdmin):
     pass

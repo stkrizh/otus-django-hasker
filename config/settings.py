@@ -28,7 +28,10 @@ INSTALLED_APPS = [
 
 # Project applications
 
-INSTALLED_APPS += ["users.apps.UsersConfig", "questions.apps.QuestionsConfig"]
+INSTALLED_APPS += [
+    "questions.apps.QuestionsConfig",
+    "users.apps.UsersConfig",
+]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",

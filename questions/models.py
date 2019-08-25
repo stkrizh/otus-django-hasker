@@ -50,6 +50,9 @@ class Answer(AbstractPost):
         related_query_name="answer",
     )
 
+    def __str__(self):
+        return f"{self.question.title} - {self.content[:50]} ..."
+
 
 class AnswerVote(AbstractVote):
     to = models.ForeignKey(
@@ -62,6 +65,7 @@ class AnswerVote(AbstractVote):
 
 class Question(AbstractPost):
     title = models.CharField(blank=False, max_length=255)
+    tags = models.ManyToManyField("Tag")
 
     def __str__(self):
         return self.title
@@ -74,3 +78,19 @@ class QuestionVote(AbstractVote):
         related_name="votes",
         related_query_name="vote",
     )
+
+
+class Tag(models.Model):
+    added = models.DateTimeField(auto_now_add=True)
+    added_by = models.ForeignKey(
+        "users.User",
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name="added_tags",
+        related_query_name="added_tag",
+    )
+    name = models.CharField(blank=False, max_length=128)
+
+    def __str__(self):
+        return self.name
