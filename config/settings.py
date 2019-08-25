@@ -28,9 +28,7 @@ INSTALLED_APPS = [
 
 # Project applications
 
-INSTALLED_APPS += [
-    "users.apps.UsersConfig",
-]
+INSTALLED_APPS += ["users.apps.UsersConfig"]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -70,14 +68,28 @@ AUTH_USER_MODEL = "users.User"
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
+        "NAME": (
+            "django.contrib.auth.password_validation."
+            "UserAttributeSimilarityValidator"
+        )
     },
-    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
     {
-        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"
+        "NAME": (
+            "django.contrib.auth.password_validation."
+            "MinimumLengthValidator"
+        )
     },
     {
-        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"
+        "NAME": (
+            "django.contrib.auth.password_validation."
+            "CommonPasswordValidator"
+        )
+    },
+    {
+        "NAME": (
+            "django.contrib.auth.password_validation."
+            "NumericPasswordValidator"
+        )
     },
 ]
 
@@ -104,6 +116,6 @@ STATIC_URL = "/static/"
 
 # Import environment sensitive settings
 try:
-    from .local_settings import *
+    from .local_settings import *  # noqa: F403, F401
 except ImportError:
     pass
