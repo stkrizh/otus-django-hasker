@@ -62,6 +62,9 @@ class AnswerVote(AbstractVote):
 class Question(AbstractPost):
     title = models.CharField(blank=False, max_length=255)
 
+    def __str__(self):
+        return self.title
+
 
 class QuestionVote(AbstractVote):
     to = models.ForeignKey(
