@@ -26,6 +26,12 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
 ]
 
+# Project applications
+
+INSTALLED_APPS += [
+    "users.apps.UsersConfig",
+]
+
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -56,6 +62,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
+# Custom user model
+AUTH_USER_MODEL = "users.User"
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
@@ -96,6 +104,6 @@ STATIC_URL = "/static/"
 
 # Import environment sensitive settings
 try:
-    from local_settings import *
+    from .local_settings import *
 except ImportError:
     pass
