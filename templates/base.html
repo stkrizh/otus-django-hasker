@@ -12,8 +12,32 @@
         <link rel="stylesheet" type="text/css" href="/static/css/main.css">
     </head>
     <body>
-        <div class="uk-container uk-container-large container">
-            <h2>{{content}}</h2>
+        <div class="uk-container uk-container-large uk-padding header">
+            <div class="uk-flex uk-flex-between uk-flex-middle">
+                <h1 class="logo">
+                    <a class="uk-link-heading" href="{% url 'index' %}">Hasker</a>
+                </h1>
+                <div>
+                    <form class="uk-search uk-search-default">
+                        <span class="uk-search-icon-flip" uk-search-icon></span>
+                        <input class="uk-search-input" type="search" placeholder="Search...">
+                    </form>
+                </div>
+                <div>
+                    <div class="uk-grid-divider" uk-grid>
+                        <div>
+                            <a href="">Log In</a>
+                        </div>
+                        <div>
+                            <a href="">Sign Up</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="uk-container uk-container-center uk-margin-top">
+            {% block content %}
+            {% endblock content %}
         </div>
     </body>
 </html>

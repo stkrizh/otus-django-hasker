@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div uk-grid>
+    <div class="uk-width-2-3">
+        <nav class="uk-navbar-container uk-navbar-transparent" uk-navbar>
+            <div class="uk-navbar-left">
+                <ul class="uk-navbar-nav">
+                    <li class="uk-active"><a href="">New questions</a></li>
+                    <li><a href="">Top questions</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        {% for question in object_list %}
+        <article class="uk-article">
+            <p class="uk-article-title uk-text-large">
+                <a class="uk-link" href="">{{ question.title }}</a>
+            </p>
+            <p class="uk-article-meta">Asked by <a href="#">{{ question.author }}</a> on {{ question.posted }}</p>
+            <p>{{ question.content }}</p>
+
+            <div class="uk-grid-small uk-child-width-auto" uk-grid>
+                <div>
+                    <a class="uk-button uk-button-text" href="#">Read more</a>
+                </div>
+                <div>
+                    <a class="uk-button uk-button-text" href="#">{{ question.answers.count }} answers</a>
+                </div>
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+    <div class="uk-width-1-3 uk-margin-top">
+        <div class="uk-container">
+            <h3>Trending</h3>
+            <hr>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

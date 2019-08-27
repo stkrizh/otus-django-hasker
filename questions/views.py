@@ -1,10 +1,8 @@
-from django.views.generic import TemplateView
+from django.views.generic import ListView
+
+from questions.models import Question
 
 
-class Index(TemplateView):
-    template_name = "base.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["content"] = "Azaza!"
-        return context
+class Index(ListView):
+    model = Question
+    template_name = "questions.html"
