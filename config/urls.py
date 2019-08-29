@@ -17,7 +17,10 @@ from django.conf import settings
 from django.contrib import admin
 from django.urls import include, path
 
+from users.views import SignUp
+
 urlpatterns = [
     path(f"{settings.ADMIN_URL}/", admin.site.urls),
     path("", include("questions.urls")),
+    path("signup", SignUp.as_view(), name="signup")
 ]
