@@ -13,5 +13,5 @@ class SignUp(CreateView):
     template_name = "users/signup.html"
 
     def form_valid(self, *args, **kwargs):
-        print("Form valid!")
+        messages.success(self.request, "Thank you for registration!")
         return super().form_valid(*args, **kwargs)

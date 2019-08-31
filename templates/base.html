@@ -36,6 +36,15 @@
             </div>
         </div>
         <div class="uk-container uk-container-center uk-margin-top">
+            {% if messages %}
+            {% for message in messages %}
+            <div uk-alert {% if message.tags %} class="uk-alert-{{ message.tags }}"{% endif %}>
+                <button class="uk-alert-close" type="button" uk-close></button>
+                <p>{{ message }}</p>
+            </div>
+            {% endfor %}
+            {% endif %}
+
             {% block content %}
             {% endblock content %}
         </div>

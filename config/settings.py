@@ -28,10 +28,7 @@ INSTALLED_APPS = [
 
 # Project applications
 
-INSTALLED_APPS += [
-    "questions.apps.QuestionsConfig",
-    "users.apps.UsersConfig",
-]
+INSTALLED_APPS += ["questions.apps.QuestionsConfig", "users.apps.UsersConfig"]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -112,13 +109,22 @@ USE_L10N = True
 USE_TZ = True
 
 
+# Custom messages tags
+
+MESSAGE_TAGS = {
+    10: "debug",
+    20: "info",
+    25: "success",
+    30: "warning",
+    40: "danger",
+}
+
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = "/static/"
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static"),
-]
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
 
 # Import environment sensitive settings
 try:
