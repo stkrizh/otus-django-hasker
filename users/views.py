@@ -1,6 +1,5 @@
 from django.contrib import messages
 from django.contrib.auth import get_user_model, login, logout
-from django.http import HttpResponseNotFound
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView, FormView, View

@@ -5,12 +5,12 @@
 <div class="uk-container uk-margin-top uk-width-1-2">
     <h3>Sign Up</h3>
 
-    <form method="POST" class="uk-form-stacked">
+    <form method="POST" class="uk-form-stacked" enctype="multipart/form-data">
         <div class="uk-margin">
-            <div class="uk-inline">
+            <div class="uk-inline uk-width-1-1">
                 <span class="uk-form-icon" uk-icon="icon: user"></span>
                 <input 
-                    class="uk-input uk-form-width-large {% if form.username.errors %} uk-form-danger {% endif %}" 
+                    class="uk-input uk-width-1-1 {% if form.username.errors %} uk-form-danger {% endif %}" 
                     type="text" name="username" 
                     placeholder="Username"
                     required
@@ -22,10 +22,10 @@
             {% endif %}
         </div>
         <div class="uk-margin">
-            <div class="uk-inline">
+            <div class="uk-inline uk-width-1-1">
                 <span class="uk-form-icon" uk-icon="icon: mail"></span>
                 <input 
-                    class="uk-input uk-form-width-large {% if form.email.errors %} uk-form-danger {% endif %}"
+                    class="uk-input uk-width-1-1 {% if form.email.errors %} uk-form-danger {% endif %}"
                     type="email" 
                     name="email" 
                     placeholder="Email"
@@ -38,10 +38,10 @@
             {% endif %}
         </div>
         <div class="uk-margin">
-            <div class="uk-inline">
+            <div class="uk-inline uk-width-1-1">
                 <span class="uk-form-icon" uk-icon="icon: lock"></span>
                 <input 
-                    class="uk-input uk-form-width-large {% if form.password1.errors %} uk-form-danger {% endif %}"
+                    class="uk-input uk-width-1-1 {% if form.password1.errors %} uk-form-danger {% endif %}"
                     type="password"
                     name="password1"
                     placeholder="Password"
@@ -54,10 +54,10 @@
             {% endif %}
         </div>
         <div class="uk-margin">
-            <div class="uk-inline">
+            <div class="uk-inline uk-width-1-1">
                 <span class="uk-form-icon" uk-icon="icon: lock"></span>
                 <input 
-                    class="uk-input uk-form-width-large {% if form.password2.errors %} uk-form-danger {% endif %}"
+                    class="uk-input uk-width-1-1 {% if form.password2.errors %} uk-form-danger {% endif %}"
                     type="password"
                     name="password2"
                     placeholder="Password confirmation"
@@ -67,6 +67,17 @@
             </div>
             {% if form.password2.errors %}
             <div class="uk-form-danger">{{ form.password2.errors }}</div>
+            {% endif %}
+        </div>
+        <div class="uk-margin" uk-margin>
+            <div class="uk-text-meta">Optional</div>
+            <div class="uk-inline uk-width-1-1"  uk-form-custom="target: true">
+                <span class="uk-form-icon" uk-icon="icon: image"></span>
+                <input type="file" name="photo">
+                <input class="uk-input uk-width-1-1 {% if form.photo.errors %} uk-form-danger {% endif %}" type="text" placeholder="Select your photo" disabled>
+            </div>
+            {% if form.photo.errors %}
+            <div class="uk-form-danger">{{ form.photo.errors }}</div>
             {% endif %}
         </div>
         <div class="uk-margin">
