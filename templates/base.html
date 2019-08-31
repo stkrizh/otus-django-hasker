@@ -9,7 +9,7 @@
         <!-- UIkit JS -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.1.7/js/uikit.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.1.7/js/uikit-icons.min.js"></script>
-        <link rel="stylesheet" type="text/css" href="/static/css/main.css">
+        <link rel="stylesheet" type="text/css" href="/static/css/main.css?t={% now 'u' %}">
     </head>
     <body>
         <div class="uk-container uk-container-large uk-padding header">
@@ -24,14 +24,29 @@
                     </form>
                 </div>
                 <div>
+                    {% if request.user.is_authenticated %}
                     <div class="uk-grid-divider" uk-grid>
-                        <div>
-                            <a href="">Log In</a>
+                        <div class="uk-flex uk-flex-row uk-flex-middle">
+                            <a href="" class="userphoto uk-margin-right" style="background-image: url({{ request.user.get_photo_url }})"></a>
+                            <a href="">{{ request.user.username }}</a>
                         </div>
                         <div>
-                            <a href="">Sign Up</a>
+                            <form method="POST" action={% url 'logout' %}>
+                                <button class="uk-button uk-button-default">Log Out</button>
+                                {% csrf_token %}
+                            </form>
                         </div>
                     </div>
+                    {% else %}
+                    <div class="uk-grid-divider" uk-grid>
+                        <div>
+                            <a href="{% url 'login' %}">Log In</a>
+                        </div>
+                        <div>
+                            <a href="{% url 'signup' %}">Sign Up</a>
+                        </div>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
