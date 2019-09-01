@@ -20,11 +20,13 @@
             <p class="uk-article-meta">Asked by <a href="#">{{ question.author }}</a> on {{ question.posted }}</p>
             <p>{{ question.content }}</p>
 
-            <div class="uk-grid-small uk-child-width-auto" uk-grid>
+            <div>
                 <div>
-                    <a class="uk-button uk-button-text" href="#">Read more</a>
+                    {% for tag in question.tags.all %}
+                    <a class="uk-button uk-button-primary uk-button-small" href="#">{{ tag.name }}</a>
+                    {% endfor %}
                 </div>
-                <div>
+                <div class="uk-margin-top">
                     <a class="uk-button uk-button-text" href="#">{{ question.answers.count }} answers</a>
                 </div>
             </div>

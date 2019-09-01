@@ -1,3 +1,7 @@
+from typing import List
+
+from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 
 
@@ -64,11 +68,24 @@ class AnswerVote(AbstractVote):
 
 
 class Question(AbstractPost):
-    title = models.CharField(blank=False, max_length=255)
+    title = models.CharField(
+        blank=False, max_length=settings.QUESTIONS_MAX_TITLE_LEN
+    )
     tags = models.ManyToManyField("Tag")
 
     def __str__(self):
         return self.title
+
+    def add_tags(self, tags: List[str], user) -> None:
+        if self.pk is None:
+            raise ValueError("Instance should be saved.")
+        for raw_tag in tags:
+            try:
+                tag = Tag.objects.get(name=raw_tag)
+            except ObjectDoesNotExist:
+                tag = Tag.objects.create(added=user, name=raw_tag)
+
+            self.tags.add(tag)
 
 
 class QuestionVote(AbstractVote):
@@ -90,7 +107,9 @@ class Tag(models.Model):
         related_name="added_tags",
         related_query_name="added_tag",
     )
-    name = models.CharField(blank=False, max_length=128)
+    name = models.CharField(
+        blank=False, max_length=settings.QUESTIONS_MAX_TAG_LEN
+    )
 
     def __str__(self):
         return self.name

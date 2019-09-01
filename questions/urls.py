@@ -20,4 +20,5 @@ from . import views
 
 urlpatterns = [
     path("", views.Index.as_view(), name="index"),
+    path("ask", views.Ask.as_view(), name="ask")
 ]

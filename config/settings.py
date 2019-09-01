@@ -133,7 +133,14 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
-# Import environment sensitive settings
+
+# App settings
+
+QUESTIONS_MAX_TITLE_LEN = 255
+QUESTIONS_MAX_NUMBER_OF_TAGS = 3
+QUESTIONS_MAX_TAG_LEN = 128
+
+
 try:
     from .local_settings import *  # noqa: F403, F401
 except ImportError:
