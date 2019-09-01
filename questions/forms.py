@@ -3,7 +3,13 @@ import re
 from django import forms
 from django.conf import settings
 
-from .models import Question
+from .models import Answer, Question
+
+
+class AnswerForm(forms.ModelForm):
+    class Meta:
+        model = Answer
+        fields = ("content",)
 
 
 class AskForm(forms.ModelForm):

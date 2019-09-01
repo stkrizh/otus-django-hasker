@@ -20,7 +20,12 @@ from . import views
 
 urlpatterns = [
     path("", views.Questions.as_view(), name="index"),
+    path("ask", views.Ask.as_view(), name="ask"),
     path("latest", views.Questions.as_view(), name="latest"),
     path("popular", views.QuestionsPopular.as_view(), name="popular"),
-    path("ask", views.Ask.as_view(), name="ask")
+    path(
+        "questions/<int:question_id>",
+        views.QuestionDetail.as_view(),
+        name="question_detail",
+    ),
 ]

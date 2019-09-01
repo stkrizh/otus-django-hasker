@@ -1,0 +1,15 @@
+<div class="uk-section">
+    <ul class="uk-pagination uk-flex-left uk-margin">
+        {% if page_obj.has_previous %}
+            <li><a href="?page=1">First</a></li>
+            <li><a href="?page={{ page_obj.previous_page_number }}"><span class="uk-margin-small-right" uk-pagination-previous></span> Previous</a></li>
+        {% endif %}
+
+        <li class="uk-disabled">Page {{ page_obj.number }} of {{ paginator.num_pages }}</li>
+
+        {% if page_obj.has_next %}
+            <li><a href="?page={{ page_obj.next_page_number }}">Next <span class="uk-margin-small-left" uk-pagination-next></span></a></li>
+            <li><a href="?page={{ paginator.num_pages }}">Last</a></li>
+        {% endif %}
+    </ul>
+</div>

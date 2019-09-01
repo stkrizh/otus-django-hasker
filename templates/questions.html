@@ -15,7 +15,7 @@
         {% for question in object_list %}
         <article class="uk-article">
             <p class="uk-article-title uk-text-large">
-                <a class="uk-link" href="">{{ question.title }}</a>
+                <a class="uk-link" href="{% url 'question_detail' question_id=question.pk %}">{{ question.title }}</a>
             </p>
             <p class="uk-article-meta">Asked by <a href="#">{{ question.author }}</a> on {{ question.posted }}</p>
             <p>{{ question.content }}</p>
@@ -33,21 +33,8 @@
         </article>
         {% endfor %}
 
-        <div class="uk-section">
-            <ul class="uk-pagination uk-flex-left uk-margin">
-                {% if page_obj.has_previous %}
-                    <li><a href="?page=1">First</a></li>
-                    <li><a href="?page={{ page_obj.previous_page_number }}"><span class="uk-margin-small-right" uk-pagination-previous></span> Previous</a></li>
-                {% endif %}
+        {% include 'pagination.html' %}
 
-                <li class="uk-disabled">Page {{ page_obj.number }} of {{ paginator.num_pages }}</li>
-
-                {% if page_obj.has_next %}
-                    <li><a href="?page={{ page_obj.next_page_number }}">Next <span class="uk-margin-small-left" uk-pagination-next></span></a></li>
-                    <li><a href="?page={{ paginator.num_pages }}">Last</a></li>
-                {% endif %}
-            </ul>
-        </div>
     </div>
     <div class="uk-width-1-3 uk-margin-top">
         <div class="uk-container">

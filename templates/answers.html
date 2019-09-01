@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div uk-grid>
+    <div class="uk-width-2-3">
+
+        <article class="uk-article">
+            <p class="uk-article-title uk-text-large">
+                <a class="uk-link" href="{% url 'question_detail' question_id=question.pk %}">{{ question.title }}</a>
+            </p>
+            <p class="uk-article-meta">Asked by <a href="#">{{ question.author }}</a> on {{ question.posted }}</p>
+            <p>{{ question.content }}</p>
+
+            <div>
+                <div>
+                    {% for tag in question.tags.all %}
+                    <a class="uk-button uk-button-primary uk-button-small" href="#">{{ tag.name }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+        </article>
+
+        <div class="uk-margin-large">
+            <h3 class="uk-heading-divider">{{ question.answers.count }} answers</h3>
+        </div>
+
+        {% for answer in object_list %}
+        <article class="uk-comment uk-margin">
+            <header class="uk-comment-header uk-grid-medium uk-flex-middle" uk-grid>
+                <div class="uk-width-auto">
+                    <img class="uk-comment-avatar" src="{{ answer.author.get_photo_url }}" width="80" height="80" alt="{{ answer.author.username }}">
+                </div>
+                <div class="uk-width-expand">
+                    <h4 class="uk-comment-title uk-margin-remove"><a class="uk-link-reset" href="#">{{ answer.author.username }}</a></h4>
+                    <ul class="uk-comment-meta uk-subnav uk-subnav-divider uk-margin-remove-top">
+                        <li><a href="#">{{ answer.posted }}</a></li>
+                    </ul>
+                </div>
+            </header>
+            <div class="uk-comment-body">
+                <p>{{ answer.content }}</p>
+            </div>
+        </article>
+        <hr>
+        {% endfor %}
+
+        {% include 'pagination.html' %}
+
+        <div class="uk-section">
+            <h3>Your answer</h3>
+
+            {% if form.non_field_errors %}
+                <div class="uk-margin-bottom">
+                {% for error in form.non_field_errors %}
+                <div class="uk-form-danger">{{ error }}</div>
+                {% endfor %}
+                </div>
+            {% endif %}
+
+            <form method="POST" class="uk-form-stacked">
+                <div class="uk-margin">
+                    <textarea class="uk-textarea" rows="8" name="content" placeholder="Write your answer here...">{% if form.content.value != None %}{{ form.content.value|stringformat:'s' }}{% endif %}</textarea>
+                    {% if form.content.errors %}
+                    <div class="uk-form-danger">{{ form.content.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="uk-margin">
+                    <button class="uk-button uk-button-primary">Answer</button>
+                </div>
+                {% csrf_token %}
+            </form>
+        </div>
+
+    </div>
+    <div class="uk-width-1-3 uk-margin-top">
+        <div class="uk-container">
+            <h3>Trending</h3>
+            <hr>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
