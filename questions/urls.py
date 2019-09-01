@@ -19,6 +19,8 @@ from . import views
 
 
 urlpatterns = [
-    path("", views.Index.as_view(), name="index"),
+    path("", views.Questions.as_view(), name="index"),
+    path("latest", views.Questions.as_view(), name="latest"),
+    path("popular", views.QuestionsPopular.as_view(), name="popular"),
     path("ask", views.Ask.as_view(), name="ask")
 ]

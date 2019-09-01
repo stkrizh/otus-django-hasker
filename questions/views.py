@@ -8,9 +8,15 @@ from .forms import AskForm
 from .models import Question
 
 
-class Index(ListView):
+class Questions(ListView):
     model = Question
+    paginate_by = 10
+    ordering = "-posted"
     template_name = "questions.html"
+
+
+class QuestionsPopular(Questions):
+    ordering = "title"
 
 
 class Ask(LoginRequiredMixin, CreateView):

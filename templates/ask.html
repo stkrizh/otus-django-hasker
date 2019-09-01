@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+
+<div class="uk-container uk-margin-top uk-width-1-2">
+
+    <h3>Ask a question</h3>
+
+    {% if form.non_field_errors %}
+        <div class="uk-margin-bottom">
+        {% for error in form.non_field_errors %}
+        <div class="uk-form-danger">{{ error }}</div>
+        {% endfor %}
+        </div>
+    {% endif %}
+
+    <form method="POST" class="uk-form-stacked">
+        <div class="uk-margin">
+            <div class="uk-inline uk-width-1-1">
+                <span class="uk-form-icon" uk-icon="icon: pencil"></span>
+                <input 
+                    class="uk-input uk-width-1-1 {% if form.title.errors %} uk-form-danger {% endif %}" 
+                    type="text" name="title" 
+                    placeholder="Title"
+                    required
+                    {% if form.title.value != None %}value="{{ form.title.value|stringformat:'s' }}"{% endif %}
+                >
+            </div>
+            {% if form.title.errors %}
+            <div class="uk-form-danger">{{ form.title.errors }}</div>
+            {% endif %}
+        </div>
+        <div class="uk-margin">
+            <textarea class="uk-textarea" rows="8" name="content" placeholder="Write your questions here...">{% if form.content.value != None %}{{ form.content.value|stringformat:'s' }}{% endif %}</textarea>
+            {% if form.content.errors %}
+            <div class="uk-form-danger">{{ form.content.errors }}</div>
+            {% endif %}
+        </div>
+        <div class="uk-margin">
+            <div class="uk-inline uk-width-1-1">
+                <span class="uk-form-icon" uk-icon="icon: tag"></span>
+                <input 
+                    class="uk-input uk-width-1-1 {% if form.tags.errors %} uk-form-danger {% endif %}" 
+                    type="text" 
+                    name="tags" 
+                    placeholder="Tags (comma separated)"
+                    {% if form.tags.value != None %}value="{{ form.tags.value|stringformat:'s' }}"{% endif %}
+                >
+            </div>
+            {% if form.tags.errors %}
+            <div class="uk-form-danger">{{ form.tags.errors }}</div>
+            {% endif %}
+        </div>
+        <div class="uk-margin">
+            <button class="uk-button uk-button-primary">Ask</button>
+        </div>
+        {% csrf_token %}
+    </form>
+
+</div>
+
+
+{% endblock content %}
