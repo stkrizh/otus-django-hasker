@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import HttpResponseForbidden
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView
@@ -56,6 +57,9 @@ class QuestionDetail(ListView):
         return queryset.filter(question=self.question)
 
     def post(self, *args, **kwargs):
+        if not self.request.user.is_authenticated:
+            return HttpResponseForbidden()
+
         form = AnswerForm(data=self.request.POST)
         if form.is_valid():
             return self.form_valid(form)

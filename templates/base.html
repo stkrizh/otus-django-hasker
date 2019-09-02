@@ -12,58 +12,61 @@
         <link rel="stylesheet" type="text/css" href="/static/css/main.css?t={% now 'u' %}">
     </head>
     <body>
-        <div class="uk-container uk-container-large uk-padding header">
-            <div class="uk-flex uk-flex-between uk-flex-middle">
-                <h1 class="logo">
-                    <a class="uk-link-heading" href="{% url 'index' %}">Hasker</a>
-                </h1>
-                <div>
-                    <form class="uk-search uk-search-default">
-                        <span class="uk-search-icon-flip" uk-search-icon></span>
-                        <input class="uk-search-input" type="search" placeholder="Search...">
-                    </form>
+        <div class="wrapper">
+            <div>
+                <div class="uk-container uk-container-large uk-padding header">
+                    <div class="uk-flex uk-flex-between uk-flex-middle">
+                        <a class="uk-logo" href="{% url 'index' %}">Hasker</a>
+                        <div>
+                            <form class="uk-search uk-search-default">
+                                <span class="uk-search-icon-flip" uk-search-icon></span>
+                                <input class="uk-search-input" type="search" placeholder="Search...">
+                            </form>
+                        </div>
+                        <div class="uk-grid" uk-grid>
+                            <div class="uk-flex uk-flex-middle">
+                                <a href="{% url 'ask' %}" class="uk-button uk-button-primary">Ask Question</a>
+                            </div>
+                            {% if request.user.is_authenticated %}
+                            <div class="uk-flex uk-flex-middle">
+                                <a href="" class="userphoto uk-margin-right" style="background-image: url({{ request.user.get_photo_url }})"></a>
+                                <a href="">{{ request.user.username }}</a>
+                            </div>
+                            <div class="uk-flex uk-flex-middle">
+                                <form method="POST" action={% url 'logout' %}>
+                                    <button class="uk-button uk-button-default">Log Out</button>
+                                    {% csrf_token %}
+                                </form>
+                            </div>
+                            {% else %}
+                            <div class="uk-flex uk-flex-middle">
+                                <a href="{% url 'login' %}" class="uk-margin-right">Log In</a>
+                                <a href="{% url 'signup' %}">Sign Up</a>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
                 </div>
-                <div class="uk-grid" uk-grid>
-                    <div class="uk-flex uk-flex-middle">
-                        <a href="{% url 'ask' %}" class="uk-button uk-button-primary">Ask Question</a>
+                <div class="uk-container uk-container-center uk-margin-top">
+                    {% if messages %}
+                    {% for message in messages %}
+                    <div uk-alert {% if message.tags %} class="uk-alert-{{ message.tags }}"{% endif %}>
+                        <button class="uk-alert-close" type="button" uk-close></button>
+                        <p>{{ message }}</p>
                     </div>
-                    {% if request.user.is_authenticated %}
-                    <div class="uk-flex uk-flex-middle">
-                        <a href="" class="userphoto uk-margin-right" style="background-image: url({{ request.user.get_photo_url }})"></a>
-                        <a href="">{{ request.user.username }}</a>
-                    </div>
-                    <div class="uk-flex uk-flex-middle">
-                        <form method="POST" action={% url 'logout' %}>
-                            <button class="uk-button uk-button-default">Log Out</button>
-                            {% csrf_token %}
-                        </form>
-                    </div>
-                    {% else %}
-                    <div class="uk-flex uk-flex-middle">
-                        <a href="{% url 'login' %}" class="uk-margin-right">Log In</a>
-                        <a href="{% url 'signup' %}">Sign Up</a>
-                    </div>
+                    {% endfor %}
                     {% endif %}
+
+                    {% block content %}
+                    {% endblock content %}
                 </div>
             </div>
-        </div>
-        <div class="uk-container uk-container-center uk-margin-top">
-            {% if messages %}
-            {% for message in messages %}
-            <div uk-alert {% if message.tags %} class="uk-alert-{{ message.tags }}"{% endif %}>
-                <button class="uk-alert-close" type="button" uk-close></button>
-                <p>{{ message }}</p>
-            </div>
-            {% endfor %}
-            {% endif %}
-
-            {% block content %}
-            {% endblock content %}
         </div>
         <div class="uk-section uk-section-secondary footer">
             <div class="uk-container">
                 <a href="{% url 'index' %}">Hasker - Poor Man's Stackoverflow</a>
             </div>
+        </div>
         </div>
     </body>
 </html>
