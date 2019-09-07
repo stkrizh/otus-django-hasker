@@ -1,8 +1,18 @@
+from enum import Enum
 from typing import List
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
+
+
+VOTE_UP = 1
+VOTE_DOWN = -1
+VOTE_CHOICES = ((VOTE_UP, "Vote Up"), (VOTE_DOWN, "Vote Down"))
+
+
+User = get_user_model()
 
 
 class AbstractPost(models.Model):
@@ -10,30 +20,51 @@ class AbstractPost(models.Model):
     for Question / Answer models.
     """
 
+    vote_class = None
+
     author = models.ForeignKey(
-        "users.User",
+        User,
         on_delete=models.CASCADE,
         related_name="%(class)ss",
         related_query_name="%(class)s",
     )
     content = models.TextField(blank=False)
     posted = models.DateTimeField(auto_now_add=True)
+    rating = models.IntegerField(default=0)
 
     class Meta:
         abstract = True
         ordering = ["-posted"]
+
+    def vote(self, user: User, value: int) -> int:
+        """ Add vote from `user` and return new rating.
+        """
+        assert self.vote_class is not None
+        assert value in (VOTE_DOWN, VOTE_UP), value
+
+        try:
+            current = self.vote_class.objects.get(user=user, to=self)
+        except ObjectDoesNotExist:
+            self.vote_class.objects.create(
+                user=user, to=self, value=value
+            )
+            return self.rating + value
+
+        if current.value == value:
+            return self.rating
+
+        self.vote_class.objects.filter(to=self, user=user).delete()
+        return self.rating + value
 
 
 class AbstractVote(models.Model):
     """ Abstract model that represents user votes for questions and answers.
     """
 
-    VOTE_TYPES = ((+1, "Vote Up"), (-1, "Vote Down"))
-
     timestamp = models.DateTimeField(auto_now=True)
-    type = models.SmallIntegerField(choices=VOTE_TYPES)
+    value = models.SmallIntegerField(choices=VOTE_CHOICES)
     user = models.ForeignKey(
-        to="users.User",
+        to=User,
         on_delete=models.CASCADE,
         related_name="%(class)ss",
         related_query_name="%(class)s",
@@ -44,8 +75,22 @@ class AbstractVote(models.Model):
         ordering = ["-timestamp"]
         unique_together = ["to", "user"]
 
+    def __str__(self):
+        return f"{self.user.username} {self.value:+d}"
+
+
+class AnswerVote(AbstractVote):
+    to = models.ForeignKey(
+        "Answer",
+        on_delete=models.CASCADE,
+        related_name="votes",
+        related_query_name="vote",
+    )
+
 
 class Answer(AbstractPost):
+    vote_class = AnswerVote
+
     is_accepted = models.BooleanField(default=False)
     question = models.ForeignKey(
         "Question",
@@ -58,9 +103,9 @@ class Answer(AbstractPost):
         return f"{self.question.title} - {self.content[:50]} ..."
 
 
-class AnswerVote(AbstractVote):
+class QuestionVote(AbstractVote):
     to = models.ForeignKey(
-        "Answer",
+        "Question",
         on_delete=models.CASCADE,
         related_name="votes",
         related_query_name="vote",
@@ -68,6 +113,8 @@ class AnswerVote(AbstractVote):
 
 
 class Question(AbstractPost):
+    vote_class = QuestionVote
+
     title = models.CharField(
         blank=False, max_length=settings.QUESTIONS_MAX_TITLE_LEN
     )
@@ -88,19 +135,10 @@ class Question(AbstractPost):
             self.tags.add(tag)
 
 
-class QuestionVote(AbstractVote):
-    to = models.ForeignKey(
-        "Question",
-        on_delete=models.CASCADE,
-        related_name="votes",
-        related_query_name="vote",
-    )
-
-
 class Tag(models.Model):
     added = models.DateTimeField(auto_now_add=True)
     added_by = models.ForeignKey(
-        "users.User",
+        User,
         blank=True,
         null=True,
         on_delete=models.SET_NULL,

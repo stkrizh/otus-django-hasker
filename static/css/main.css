@@ -31,8 +31,67 @@ body {
     display: inline-block;
     width: 40px;
     height: 40px;
+    background-position: center;
     background-origin: border-box;
     background-repeat: no-repeat;
     background-size: cover;
     border-radius: 100%;
+}
+
+.userphoto-mid {
+    width: 60px;
+    height: 60px;
+}
+
+
+.votes {
+    width: 60px;
+}
+
+.votes {
+    width: 60px;
+}
+
+.votes__value {
+    width: 40px;
+    height: 40px;
+    position: relative;
+}
+
+.votes__value span {
+    display: block;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.votes__vote {
+    opacity: 0.5;
+    cursor: pointer;
+}
+
+.votes__vote:hover {
+    opacity: 1;
+}
+
+.votes__vote--inactive {
+    opacity: 0.1;
+    cursor: not-allowed;
+}
+
+.votes__vote--inactive:hover {
+    opacity: 0.1;
+}
+
+.loader {
+    opacity: 0.5;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.hidden {
+    visibility: hidden;
 }

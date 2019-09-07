@@ -28,4 +28,6 @@ urlpatterns = [
         views.QuestionDetail.as_view(),
         name="question_detail",
     ),
+    path("vote/question", views.QuestionVote.as_view(), name="vote_question"),
+    path("vote/answer", views.AnswerVote.as_view(), name="vote_answer"),
 ]

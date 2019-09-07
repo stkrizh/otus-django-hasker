@@ -7,7 +7,7 @@
             <div class="uk-navbar-left">
                 <ul class="uk-navbar-nav">
                     <li {% if view.ordering == '-posted' %} class="uk-active" {% endif %}><a href="{% url 'latest' %}">New questions</a></li>
-                    <li {% if view.ordering == 'title' %} class="uk-active" {% endif %}><a href="{% url 'popular' %}">Top questions</a></li>
+                    <li {% if view.ordering == '-rating' %} class="uk-active" {% endif %}><a href="{% url 'popular' %}">Top questions</a></li>
                 </ul>
             </div>
         </nav>
@@ -27,7 +27,8 @@
                     {% endfor %}
                 </div>
                 <div class="uk-margin-top">
-                    <a class="uk-button uk-button-text" href="#">{{ question.answers.count }} answers</a>
+                    <a class="uk-button uk-button-text" href="{% url 'question_detail' question_id=question.pk %}">{{ question.answers.count }} answers</a>
+                    <a class="uk-button uk-button-text uk-margin-left" href="{% url 'question_detail' question_id=question.pk %}">{{ question.votes.count }} votes</a>
                 </div>
             </div>
         </article>

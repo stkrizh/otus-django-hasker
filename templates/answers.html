@@ -1,24 +1,37 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
 <div uk-grid>
     <div class="uk-width-2-3">
 
-        <article class="uk-article">
-            <p class="uk-article-title uk-text-large">
-                <a class="uk-link" href="{% url 'question_detail' question_id=question.pk %}">{{ question.title }}</a>
-            </p>
-            <p class="uk-article-meta">Asked by <a href="#">{{ question.author }}</a> on {{ question.posted }}</p>
-            <p>{{ question.content }}</p>
-
-            <div>
-                <div>
-                    {% for tag in question.tags.all %}
-                    <a class="uk-button uk-button-primary uk-button-small" href="#">{{ tag.name }}</a>
-                    {% endfor %}
+        <div uk-grid>
+            <div class="votes uk-flex uk-flex-column uk-flex-top uk-flex-middle" data-url="{% url 'vote_question' %}" data-target="{{ question.pk }}">
+                <div class="votes__vote votes__vote-up" data-value="1" uk-icon="icon: chevron-up; ratio: 2"></div>
+                <div class="votes__value uk-text-bold">
+                    <span>{{ question.rating }}</span>
+                    <img class="loader hidden" src="{% static 'ui/ajax-loader.gif' %}">
                 </div>
+                <div class="votes__vote votes__vote-down" data-value="-1" uk-icon="icon: chevron-down; ratio: 2"></div>
             </div>
-        </article>
+            <div class="uk-width-expand">
+                <article class="uk-article">
+                    <p class="uk-article-title uk-text-large">
+                        <a class="uk-link" href="{% url 'question_detail' question_id=question.pk %}">{{ question.title }}</a>
+                    </p>
+                    <p class="uk-article-meta">Asked by <a href="#">{{ question.author }}</a> on {{ question.posted }}</p>
+                    <p>{{ question.content }}</p>
+
+                    <div>
+                        <div>
+                            {% for tag in question.tags.all %}
+                            <a class="uk-button uk-button-primary uk-button-small" href="#">{{ tag.name }}</a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </div>
 
         <div class="uk-margin-large">
             <h3 class="uk-heading-divider">{{ question.answers.count }} answers</h3>
@@ -26,19 +39,31 @@
 
         {% for answer in object_list %}
         <article class="uk-comment uk-margin">
-            <header class="uk-comment-header uk-grid-medium uk-flex-middle" uk-grid>
-                <div class="uk-width-auto">
-                    <img class="uk-comment-avatar" src="{{ answer.author.get_photo_url }}" width="80" height="80" alt="{{ answer.author.username }}">
+            <div uk-grid>
+                <div class="votes uk-flex uk-flex-column uk-flex-top uk-flex-middle" data-url="{% url 'vote_answer' %}" data-target="{{ answer.pk }}">
+                    <div class="votes__vote votes__vote-up" data-value="1" uk-icon="icon: chevron-up; ratio: 2"></div>
+                    <div class="votes__value uk-text-bold">
+                        <span>{{ answer.rating }}</span>
+                        <img class="loader hidden" src="{% static 'ui/ajax-loader.gif' %}">
+                    </div>
+                    <div class="votes__vote votes__vote-down" data-value="-1" uk-icon="icon: chevron-down; ratio: 2"></div>
                 </div>
                 <div class="uk-width-expand">
-                    <h4 class="uk-comment-title uk-margin-remove"><a class="uk-link-reset" href="#">{{ answer.author.username }}</a></h4>
-                    <ul class="uk-comment-meta uk-subnav uk-subnav-divider uk-margin-remove-top">
-                        <li><a href="#">{{ answer.posted }}</a></li>
-                    </ul>
+                    <header class="uk-comment-header uk-grid-medium uk-flex-middle" uk-grid>
+                        <div class="uk-width-auto">
+                            <div class="uk-comment-avatar userphoto userphoto-mid" style="background-image: url({{ answer.author.get_photo_url }})"></div>
+                        </div>
+                        <div class="uk-width-expand">
+                            <h4 class="uk-comment-title uk-margin-remove"><a class="uk-link-reset" href="#">{{ answer.author.username }}</a></h4>
+                            <ul class="uk-comment-meta uk-subnav uk-subnav-divider uk-margin-remove-top">
+                                <li><a href="#">{{ answer.posted }}</a></li>
+                            </ul>
+                        </div>
+                    </header>
+                    <div class="uk-comment-body">
+                        <p>{{ answer.content }}</p>
+                    </div>
                 </div>
-            </header>
-            <div class="uk-comment-body">
-                <p>{{ answer.content }}</p>
             </div>
         </article>
         <hr>
@@ -80,6 +105,14 @@
             <h3>Trending</h3>
             <hr>
         </div>
+    </div>
+</div>
+
+<div id="modal-center" class="uk-flex-top" uk-modal>
+    <div class="uk-modal-dialog uk-modal-body uk-margin-auto-vertical">
+        <button class="uk-modal-close-default" type="button" uk-close></button>
+        <h2 class="uk-text-danger">Error</h2>
+        <p>Please <a href="{% url 'login' %}">sign in</a> or <a href="{% url 'signup' %}">register</a> to be able to vote</p>
     </div>
 </div>
 

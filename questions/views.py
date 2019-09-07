@@ -1,18 +1,47 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponseForbidden
+from django.core.exceptions import ObjectDoesNotExist
+from django.http import (
+    JsonResponse,
+    HttpResponseBadRequest,
+    HttpResponseForbidden,
+    HttpResponseNotFound,
+)
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, ListView
+from django.views.generic import CreateView, FormView, ListView, View
 
-from .forms import AnswerForm, AskForm
+from .forms import AnswerForm, AskForm, VoteForm
 from .models import Answer, Question
+
+
+class Ask(LoginRequiredMixin, CreateView):
+    form_class = AskForm
+    login_url = reverse_lazy("login")
+    model = Question
+    template_name = "ask.html"
+    success_url = reverse_lazy("index")
+
+    def form_valid(self, form):
+        """If the form is valid, save the question and its tags.
+        """
+        question = form.save(commit=False)
+        question.author = self.request.user
+        question.save()
+
+        raw_tags = form.cleaned_data["tags"]
+        question.add_tags(raw_tags, self.request.user)
+
+        messages.success(
+            self.request, "Your question has been added successfully!"
+        )
+        return redirect(self.success_url)
 
 
 class QuestionDetail(ListView):
     form = None
     model = Answer
-    ordering = "posted"
+    ordering = ("-rating", "posted")
     paginate_by = 3
     template_name = "answers.html"
 
@@ -75,27 +104,35 @@ class Questions(ListView):
 
 
 class QuestionsPopular(Questions):
-    ordering = "title"
+    ordering = "-rating"
 
 
-class Ask(LoginRequiredMixin, CreateView):
-    form_class = AskForm
-    login_url = reverse_lazy("login")
+class QuestionVote(FormView):
+    form_class = VoteForm
+    http_method_names = ("post",)
     model = Question
-    template_name = "ask.html"
-    success_url = reverse_lazy("index")
+
+    def dispatch(self, *args, **kwargs):
+        if not self.request.user.is_authenticated:
+            return HttpResponseForbidden()
+        return super().dispatch(*args, **kwargs)
+
+    def get_form_kwargs(self):
+        """Return the keyword arguments for instantiating the form."""
+        kwargs = super().get_form_kwargs()
+        kwargs["model"] = self.model
+        return kwargs
+
+    def form_invalid(self, form):
+        return JsonResponse(data=form.errors, status=400)
 
     def form_valid(self, form):
-        """If the form is valid, save the question and its tags.
-        """
-        question = form.save(commit=False)
-        question.author = self.request.user
-        question.save()
+        target = form.cleaned_data["target"]
+        value = form.cleaned_data["value"]
 
-        raw_tags = form.cleaned_data["tags"]
-        question.add_tags(raw_tags, self.request.user)
+        new_rating = target.vote(user=self.request.user, value=value)
+        return JsonResponse(data={"rating": new_rating})
 
-        messages.success(
-            self.request, "Your question has been added successfully!"
-        )
-        return redirect(self.success_url)
+
+class AnswerVote(QuestionVote):
+    model = Answer
