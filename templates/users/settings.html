@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="uk-container uk-margin-top uk-width-1-2">
+    <h3>Settings</h3>
+
+    <form method="POST" class="uk-form-stacked" enctype="multipart/form-data">
+        <div class="uk-margin">
+            <div class="uk-inline uk-width-1-1 uk-flex uk-flex-row uk-flex-middle">
+                <div class="userphoto userphoto--big" style="background-image: url({{ object.get_photo_url }})"></div>
+                <span class="uk-margin-left">{{ object.username }}</span>
+            </div>
+        </div>
+        <div class="uk-margin">
+            <div class="uk-inline uk-width-1-1">
+                <span class="uk-form-icon" uk-icon="icon: mail"></span>
+                <input 
+                    class="uk-input uk-width-1-1 {% if form.email.errors %} uk-form-danger {% endif %}"
+                    type="email" 
+                    name="email" 
+                    placeholder="Email"
+                    required
+                    {% if form.email.value != None %}value="{{ form.email.value|stringformat:'s' }}"{% endif %} 
+                >
+            </div>
+            {% if form.email.errors %}
+            <div class="uk-form-danger">{{ form.email.errors }}</div>
+            {% endif %}
+        </div>
+        <div class="uk-margin" uk-margin>
+            <div class="uk-inline uk-width-1-1"  uk-form-custom="target: true">
+                <span class="uk-form-icon" uk-icon="icon: image"></span>
+                <input type="file" name="photo">
+                <input class="uk-input uk-width-1-1 {% if form.photo.errors %} uk-form-danger {% endif %}" type="text" placeholder="Select your photo" disabled>
+            </div>
+            {% if form.photo.errors %}
+            <div class="uk-form-danger">{{ form.photo.errors }}</div>
+            {% endif %}
+        </div>
+        <div class="uk-margin">
+            <button class="uk-button uk-button-primary">Save</button>
+        </div>
+        {% csrf_token %}
+    </form>
+
+</div>
+
+
+{% endblock content %}

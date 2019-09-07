@@ -18,7 +18,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
-from users.views import LogIn, LogOut, SignUp
+from users.views import LogIn, LogOut, Settings, SignUp
 
 
 urlpatterns = [
@@ -26,6 +26,7 @@ urlpatterns = [
     path("", include("questions.urls")),
     path("login", LogIn.as_view(), name="login"),
     path("logout", LogOut.as_view(), name="logout"),
+    path("settings", Settings.as_view(), name="settings"),
     path("signup", SignUp.as_view(), name="signup"),
 ]
 

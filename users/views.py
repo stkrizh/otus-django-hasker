@@ -1,12 +1,13 @@
 from django.contrib import messages
 from django.contrib.auth import get_user_model, login, logout
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
-from django.views.generic.edit import CreateView, FormView, View
+from django.views.generic.edit import CreateView, FormView, UpdateView, View
 
 from questions.views import TrendingMixin
 
-from .forms import LogInForm, SignUpForm
+from .forms import LogInForm, SettingsForm, SignUpForm
 
 
 class LogIn(TrendingMixin, FormView):
@@ -61,3 +62,22 @@ class SignUp(TrendingMixin, CreateView):
     def form_valid(self, *args, **kwargs):
         messages.success(self.request, "Thank you for registration!")
         return super().form_valid(*args, **kwargs)
+
+
+class Settings(TrendingMixin, LoginRequiredMixin, UpdateView):
+    """ User settings view. Each user can edit only his/her own settings.
+    """
+
+    form_class = SettingsForm
+    login_url = reverse_lazy("login")
+    success_url = reverse_lazy("settings")
+    template_name = "users/settings.html"
+
+    def form_valid(self, *args, **kwargs):
+        messages.success(
+            self.request, "Your settings have been succesfully updated!"
+        )
+        return super().form_valid(*args, **kwargs)
+
+    def get_object(self, queryset=None):
+        return self.request.user

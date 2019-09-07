@@ -43,6 +43,10 @@ body {
     height: 60px;
 }
 
+.userphoto--big {
+    width: 120px;
+    height: 120px;
+}
 
 .votes {
     width: 60px;
