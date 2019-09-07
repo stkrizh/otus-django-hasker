@@ -17,12 +17,12 @@
                 <a class="uk-link" href="{% url 'question_detail' question_id=question.pk %}">{{ question.title }}</a>
             </p>
             <p class="uk-article-meta">Asked by <a href="#">{{ question.author }}</a> on {{ question.posted }}</p>
-            <p>{{ question.content }}</p>
+            <p class="wrapword">{{ question.content }}</p>
 
             <div>
                 <div>
                     {% for tag in question.tags.all %}
-                    <a class="uk-button uk-button-primary uk-button-small" href="#">{{ tag.name }}</a>
+                    <a class="uk-button uk-button-primary uk-button-small" href="{% url 'tag' tag=tag.name %}">{{ tag.name }}</a>
                     {% endfor %}
                 </div>
             </div>

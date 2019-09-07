@@ -24,6 +24,7 @@ urlpatterns = [
     path("latest", views.Questions.as_view(), name="latest"),
     path("popular", views.QuestionsPopular.as_view(), name="popular"),
     path("search", views.QuestionsSearch.as_view(), name="search"),
+    path("tag/<tag>", views.QuestionsTag.as_view(), name="tag"),
     path(
         "questions/<int:question_id>",
         views.QuestionDetail.as_view(),

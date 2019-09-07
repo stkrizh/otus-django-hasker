@@ -54,7 +54,7 @@ class QuestionDetail(TrendingMixin, ListView):
 
     form = None
     model = Answer
-    ordering = ("-rating", "posted")
+    ordering = ("-rating", "-posted")
     paginate_by = 3
     template_name = "answers.html"
 
@@ -110,7 +110,7 @@ class QuestionDetail(TrendingMixin, ListView):
 
 
 class Questions(TrendingMixin, ListView):
-    """ List of questions.
+    """ List of questions sorted by posted time.
     """
 
     model = Question
@@ -120,7 +120,7 @@ class Questions(TrendingMixin, ListView):
 
 
 class QuestionsPopular(Questions):
-    """ List of questions.
+    """ List of questions sorted by rating.
     """
 
     ordering = ("-rating", "-posted")
@@ -133,8 +133,17 @@ class QuestionsSearch(Questions):
     ordering = ("-rating", "-posted")
     query = ""
 
-    def get_queryset(self):
+    def get(self, *args, **kwargs):
         self.query = self.request.GET.get("q", "").strip()
+        if "tag:" in self.query:
+            *_, tag = self.query.partition(":")
+            tag = tag.strip().lower()
+            if tag:
+                return redirect("tag", tag=tag)
+
+        return super().get(*args, **kwargs)
+
+    def get_queryset(self):
         qs = super().get_queryset()
         qs = qs.annotate(
             similarity=Greatest(
@@ -148,6 +157,16 @@ class QuestionsSearch(Questions):
         context = super().get_context_data(*args, **kwargs)
         context["query"] = self.query
         return context
+
+
+class QuestionsTag(Questions):
+    ordering = ("-rating", "-posted")
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        tag = self.kwargs["tag"].strip().lower()
+        qs = qs.filter(tags__name=tag)
+        return qs
 
 
 class QuestionVote(TrendingMixin, FormView):
