@@ -4,6 +4,8 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
+from django.db.models import Q
+from django.db.models.functions import Greatest
 
 
 VOTE_UP = 1

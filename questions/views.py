@@ -1,5 +1,8 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.postgres.search import TrigramSimilarity
+from django.db.models import Q
+from django.db.models.functions import Greatest
 from django.http import JsonResponse, HttpResponseForbidden
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy
@@ -120,7 +123,31 @@ class QuestionsPopular(Questions):
     """ List of questions.
     """
 
-    ordering = "-rating"
+    ordering = ("-rating", "-posted")
+
+
+class QuestionsSearch(Questions):
+    """ Search for questions.
+    """
+
+    ordering = ("-rating", "-posted")
+    query = ""
+
+    def get_queryset(self):
+        self.query = self.request.GET.get("q", "").strip()
+        qs = super().get_queryset()
+        qs = qs.annotate(
+            similarity=Greatest(
+                TrigramSimilarity("title", self.query),
+                TrigramSimilarity("content", self.query),
+            )
+        )
+        return qs.filter(similarity__gt=0.1)
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context["query"] = self.query
+        return context
 
 
 class QuestionVote(TrendingMixin, FormView):

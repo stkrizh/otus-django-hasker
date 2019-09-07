@@ -21,11 +21,11 @@
             <div>
                 <div class="uk-container uk-container-large uk-padding header">
                     <div class="uk-flex uk-flex-between uk-flex-middle">
-                        <a class="uk-logo" href="{% url 'index' %}">Hasker</a>
-                        <div>
-                            <form class="uk-search uk-search-default">
-                                <span class="uk-search-icon-flip" uk-search-icon></span>
-                                <input class="uk-search-input" type="search" placeholder="Search...">
+                        <a class="uk-logo uk-margin-right" href="{% url 'index' %}">Hasker</a>
+                        <div class="uk-width-expand uk-margin-right">
+                            <form class="uk-search uk-search-default uk-width-expand" action="{% url 'search' %}">
+                                <button class="uk-search-icon-flip" uk-search-icon></button>
+                                <input class="uk-search-input" type="search" name="q" placeholder="Search..." value="{{ query }}">
                             </form>
                         </div>
                         <div class="uk-grid" uk-grid>
