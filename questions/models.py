@@ -1,5 +1,4 @@
-from enum import Enum
-from typing import List
+from typing import List, Optional
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -20,7 +19,7 @@ class AbstractPost(models.Model):
     for Question / Answer models.
     """
 
-    vote_class = None
+    vote_class: Optional[models.Model] = None
 
     author = models.ForeignKey(
         User,
@@ -36,7 +35,7 @@ class AbstractPost(models.Model):
         abstract = True
         ordering = ["-posted"]
 
-    def vote(self, user: User, value: int) -> int:
+    def vote(self, user, value: int) -> int:
         """ Add vote from `user` and return new rating.
         """
         assert self.vote_class is not None
@@ -45,9 +44,7 @@ class AbstractPost(models.Model):
         try:
             current = self.vote_class.objects.get(user=user, to=self)
         except ObjectDoesNotExist:
-            self.vote_class.objects.create(
-                user=user, to=self, value=value
-            )
+            self.vote_class.objects.create(user=user, to=self, value=value)
             return self.rating + value
 
         if current.value == value:

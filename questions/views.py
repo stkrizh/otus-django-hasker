@@ -1,12 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.exceptions import ObjectDoesNotExist
-from django.http import (
-    JsonResponse,
-    HttpResponseBadRequest,
-    HttpResponseForbidden,
-    HttpResponseNotFound,
-)
+from django.http import JsonResponse, HttpResponseForbidden
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, FormView, ListView
@@ -16,6 +10,9 @@ from .models import Answer, Question
 
 
 class TrendingMixin:
+    """ Adds trending questions query set to the context.
+    """
+
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context["trending"] = Question.trending()
@@ -23,6 +20,9 @@ class TrendingMixin:
 
 
 class Ask(TrendingMixin, LoginRequiredMixin, CreateView):
+    """ View for adding new questions.
+    """
+
     form_class = AskForm
     login_url = reverse_lazy("login")
     model = Question
@@ -46,6 +46,9 @@ class Ask(TrendingMixin, LoginRequiredMixin, CreateView):
 
 
 class QuestionDetail(TrendingMixin, ListView):
+    """ Question details / answers / add answer form
+    """
+
     form = None
     model = Answer
     ordering = ("-rating", "posted")
@@ -59,7 +62,7 @@ class QuestionDetail(TrendingMixin, ListView):
         return super().dispatch(*args, **kwargs)
 
     def form_invalid(self, form):
-        """If the form is invalid, render the invalid form.
+        """ If the form is invalid, render the invalid form.
         """
         self.form = form
         messages.error(
@@ -69,7 +72,7 @@ class QuestionDetail(TrendingMixin, ListView):
         return super().get(self.request)
 
     def form_valid(self, form):
-        """If the form is valid, save the answer.
+        """ If the form is valid, save the answer.
         """
         answer = form.save(commit=False)
         answer.author = self.request.user
@@ -104,6 +107,9 @@ class QuestionDetail(TrendingMixin, ListView):
 
 
 class Questions(TrendingMixin, ListView):
+    """ List of questions.
+    """
+
     model = Question
     paginate_by = 10
     ordering = "-posted"
@@ -111,10 +117,16 @@ class Questions(TrendingMixin, ListView):
 
 
 class QuestionsPopular(Questions):
+    """ List of questions.
+    """
+
     ordering = "-rating"
 
 
 class QuestionVote(TrendingMixin, FormView):
+    """ Vote for a question. It's supposed to be called with AJAX.
+    """
+
     form_class = VoteForm
     http_method_names = ("post",)
     model = Question
@@ -142,4 +154,7 @@ class QuestionVote(TrendingMixin, FormView):
 
 
 class AnswerVote(QuestionVote):
+    """ Vote for a answer. It's supposed to be called with AJAX.
+    """
+
     model = Answer
