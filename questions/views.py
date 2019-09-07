@@ -9,13 +9,20 @@ from django.http import (
 )
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, FormView, ListView, View
+from django.views.generic import CreateView, FormView, ListView
 
 from .forms import AnswerForm, AskForm, VoteForm
 from .models import Answer, Question
 
 
-class Ask(LoginRequiredMixin, CreateView):
+class TrendingMixin:
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context["trending"] = Question.trending()
+        return context
+
+
+class Ask(TrendingMixin, LoginRequiredMixin, CreateView):
     form_class = AskForm
     login_url = reverse_lazy("login")
     model = Question
@@ -38,7 +45,7 @@ class Ask(LoginRequiredMixin, CreateView):
         return redirect(self.success_url)
 
 
-class QuestionDetail(ListView):
+class QuestionDetail(TrendingMixin, ListView):
     form = None
     model = Answer
     ordering = ("-rating", "posted")
@@ -96,7 +103,7 @@ class QuestionDetail(ListView):
             return self.form_invalid(form)
 
 
-class Questions(ListView):
+class Questions(TrendingMixin, ListView):
     model = Question
     paginate_by = 10
     ordering = "-posted"
@@ -107,7 +114,7 @@ class QuestionsPopular(Questions):
     ordering = "-rating"
 
 
-class QuestionVote(FormView):
+class QuestionVote(TrendingMixin, FormView):
     form_class = VoteForm
     http_method_names = ("post",)
     model = Question

@@ -84,7 +84,7 @@ class AnswerVote(AbstractVote):
         "Answer",
         on_delete=models.CASCADE,
         related_name="votes",
-        related_query_name="vote",
+        related_query_name="votes",
     )
 
 
@@ -108,7 +108,7 @@ class QuestionVote(AbstractVote):
         "Question",
         on_delete=models.CASCADE,
         related_name="votes",
-        related_query_name="vote",
+        related_query_name="votes",
     )
 
 
@@ -122,6 +122,13 @@ class Question(AbstractPost):
 
     def __str__(self):
         return self.title
+
+    @classmethod
+    def trending(cls, count: int = 5) -> models.QuerySet:
+        """ Returns a query set of trending questions.
+        """
+        qs = cls.objects.annotate(votes_count=models.Count("votes"))
+        return qs.order_by("-votes_count")[:count]
 
     def add_tags(self, tags: List[str], user) -> None:
         if self.pk is None:

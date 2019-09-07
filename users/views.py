@@ -4,10 +4,12 @@ from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView, FormView, View
 
+from questions.views import TrendingMixin
+
 from .forms import LogInForm, SignUpForm
 
 
-class LogIn(FormView):
+class LogIn(TrendingMixin, FormView):
     form_class = LogInForm
     success_url = reverse_lazy("index")
     template_name = "users/login.html"
@@ -44,7 +46,7 @@ class LogOut(View):
         return redirect("index")
 
 
-class SignUp(CreateView):
+class SignUp(TrendingMixin, CreateView):
     form_class = SignUpForm
     model = get_user_model()
     success_url = reverse_lazy("index")
