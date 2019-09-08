@@ -1,7 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.postgres.search import TrigramSimilarity
-from django.db.models import Q
 from django.db.models.functions import Greatest
 from django.http import JsonResponse, HttpResponseForbidden
 from django.shortcuts import redirect, get_object_or_404
@@ -10,6 +9,7 @@ from django.views.generic import CreateView, FormView, ListView
 
 from .forms import AnswerForm, AskForm, VoteForm
 from .models import Answer, Question
+from .utils import send_notification_about_new_answer
 
 
 class TrendingMixin:
@@ -81,6 +81,10 @@ class QuestionDetail(TrendingMixin, ListView):
         answer.author = self.request.user
         answer.question = self.question
         answer.save()
+
+        send_notification_about_new_answer(
+            self.request, self.question.author.email, self.question.pk
+        )
 
         messages.success(self.request, "Thank you for your answer!")
         return redirect(self.request.build_absolute_uri())
