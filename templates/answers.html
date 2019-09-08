@@ -16,7 +16,7 @@
             <p class="uk-article-title uk-text-large">
                 <a class="uk-link" href="{% url 'question_detail' question_id=question.pk %}">{{ question.title }}</a>
             </p>
-            <p class="uk-article-meta">Asked by <a href="#">{{ question.author }}</a> on {{ question.posted }}</p>
+            <p class="uk-article-meta">Asked by <a href="#"><b>{{ question.author }}</b></a> on {{ question.posted }}</p>
             <p class="wrapword">{{ question.content }}</p>
 
             <div>
@@ -35,7 +35,7 @@
 </div>
 
 {% for answer in object_list %}
-<article class="uk-comment uk-margin">
+<article class="uk-comment uk-margin {% if answer.is_accepted %}uk-comment-primary{% endif %}">
     <div uk-grid>
         <div class="votes uk-flex uk-flex-column uk-flex-top uk-flex-middle" data-url="{% url 'vote_answer' %}" data-target="{{ answer.pk }}">
             <div class="votes__vote votes__vote-up" data-value="1" uk-icon="icon: chevron-up; ratio: 2"></div>
@@ -47,7 +47,10 @@
         </div>
         <div class="uk-width-expand">
             <header class="uk-comment-header uk-grid-medium uk-flex-middle" uk-grid>
-                <div class="uk-width-auto">
+                <div class="uk-width-auto uk-flex uk-flex-middle">
+                    {% if request.user == question.author %}
+                    <div class="uk-margin-right answer-mark {% if answer.is_accepted %}answer-mark--marked{% endif %}" data-url="{% url 'answer_mark' answer_id=answer.pk %}" uk-icon="icon: star; ratio: 2"></div>
+                    {% endif %}
                     <div class="uk-comment-avatar userphoto userphoto-mid" style="background-image: url({{ answer.author.get_photo_url }})"></div>
                 </div>
                 <div class="uk-width-expand">

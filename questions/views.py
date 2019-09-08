@@ -1,11 +1,12 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.postgres.search import TrigramSimilarity
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.functions import Greatest
 from django.http import JsonResponse, HttpResponseForbidden
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, FormView, ListView
+from django.views.generic import CreateView, FormView, ListView, View
 
 from .forms import AnswerForm, AskForm, VoteForm
 from .models import Answer, Question
@@ -54,7 +55,7 @@ class QuestionDetail(TrendingMixin, ListView):
 
     form = None
     model = Answer
-    ordering = ("-rating", "-posted")
+    ordering = ("-is_accepted", "-rating", "-posted")
     paginate_by = 3
     template_name = "answers.html"
 
@@ -173,7 +174,7 @@ class QuestionsTag(Questions):
         return qs
 
 
-class QuestionVote(TrendingMixin, FormView):
+class QuestionVote(FormView):
     """ Vote for a question. It's supposed to be called with AJAX.
     """
 
@@ -208,3 +209,32 @@ class AnswerVote(QuestionVote):
     """
 
     model = Answer
+
+
+class AnswerMark(View):
+    """ Mark / unmark an answer as accepted.
+    It's supposed to be called with AJAX.
+    """
+
+    http_method_names = ("post",)
+
+    def post(self, *args, **kwargs):
+        if not self.request.user.is_authenticated:
+            return HttpResponseForbidden()
+
+        try:
+            answer = Answer.objects.get(pk=self.kwargs["answer_id"])
+        except ObjectDoesNotExist:
+            return JsonResponse(
+                data={"error": "Answer doesn't exist."}, status=404
+            )
+
+        if answer.question.author != self.request.user:
+            return HttpResponseForbidden()
+
+        if answer.is_accepted:
+            answer.unmark()
+        else:
+            answer.mark()
+
+        return JsonResponse(data={"accepted": answer.is_accepted})

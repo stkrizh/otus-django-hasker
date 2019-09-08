@@ -20,6 +20,11 @@ from . import views
 
 urlpatterns = [
     path("", views.Questions.as_view(), name="index"),
+    path(
+        "answer/mark/<int:answer_id>",
+        views.AnswerMark.as_view(),
+        name="answer_mark",
+    ),
     path("ask", views.Ask.as_view(), name="ask"),
     path("latest", views.Questions.as_view(), name="latest"),
     path("popular", views.QuestionsPopular.as_view(), name="popular"),

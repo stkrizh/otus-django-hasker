@@ -110,3 +110,27 @@ body {
     word-break: break-all;
     white-space: normal;
 }
+
+.answer-mark {
+    opacity: 0.5;
+    cursor: pointer;
+}
+.answer-mark:hover {
+    opacity: 1.0;
+    cursor: pointer;
+}
+
+.answer-mark--marked {
+    color: cornflowerblue;
+    opacity: 1.0;
+    cursor: pointer;
+}
+
+.answer-mark--marked:hover {
+    opacity: 0.5;
+}
+
+.answer-mark--inactive {
+    opacity: 0.1;
+    cursor: not-allowed;
+}

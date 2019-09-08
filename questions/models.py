@@ -101,6 +101,19 @@ class Answer(AbstractPost):
     def __str__(self):
         return f"{self.question.title} - {self.content[:50]} ..."
 
+    def mark(self):
+        """ Mark the answer as accepted.
+        """
+        self.question.answers.update(is_accepted=False)
+        self.is_accepted = True
+        self.save(update_fields=["is_accepted"])
+
+    def unmark(self):
+        """ Unmark acceptance from the answer.
+        """
+        self.is_accepted = False
+        self.save(update_fields=["is_accepted"])
+
 
 class QuestionVote(AbstractVote):
     to = models.ForeignKey(
