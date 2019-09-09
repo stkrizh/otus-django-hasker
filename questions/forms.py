@@ -25,7 +25,7 @@ class AskForm(forms.ModelForm):
         raw_tags, _ = re.subn(r"\s+", " ", raw_tags)
 
         tags = (tag.strip().lower() for tag in raw_tags.split(","))
-        tags = list(filter(bool, tags))
+        tags = set(filter(bool, tags))
 
         if len(tags) > settings.QUESTIONS_MAX_NUMBER_OF_TAGS:
             n = settings.QUESTIONS_MAX_NUMBER_OF_TAGS
@@ -36,7 +36,7 @@ class AskForm(forms.ModelForm):
                 "Ensure each tag has at most 128 characters."
             )
 
-        return tags
+        return sorted(tags)
 
 
 class VoteForm(forms.Form):

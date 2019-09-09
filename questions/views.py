@@ -3,7 +3,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.postgres.search import TrigramSimilarity
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.functions import Greatest
-from django.http import JsonResponse, HttpResponseForbidden
+from django.http import JsonResponse, HttpResponseForbidden, Http404
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, FormView, ListView, View
@@ -140,6 +140,10 @@ class QuestionsSearch(Questions):
 
     def get(self, *args, **kwargs):
         self.query = self.request.GET.get("q", "").strip()
+
+        if not self.query:
+            raise Http404("Query should be specified.")
+
         if "tag:" in self.query:
             *_, tag = self.query.partition(":")
             tag = tag.strip().lower()
