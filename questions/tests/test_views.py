@@ -289,5 +289,5 @@ class TestAnswerMark(CreateDataMixin, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["accepted"], not before)
 
-        self.answer_1.referesh_from_db()
+        self.answer_1.refresh_from_db()
         self.assertEqual(self.answer_1.is_accepted, not before)
