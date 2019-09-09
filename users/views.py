@@ -17,7 +17,7 @@ class LogIn(TrendingMixin, FormView):
 
     def post(self, request, *args, **kwargs):
         if self.request.user.is_authenticated:
-            messages.warning(self.request, "You are already logged in.")
+            messages.warning(self.request, "You have already logged in.")
             return redirect("index")
         return super().post(request, *args, **kwargs)
 
@@ -37,7 +37,7 @@ class LogOut(View):
 
     def post(self, request, *args, **kwargs):
         if not self.request.user.is_authenticated:
-            messages.warning(self.request, "You are not logged in.")
+            messages.warning(self.request, "You are not authenticated!")
             return redirect("index")
 
         logout(self.request)
@@ -55,7 +55,7 @@ class SignUp(TrendingMixin, CreateView):
 
     def dispatch(self, request, *args, **kwargs):
         if self.request.user.is_authenticated:
-            messages.warning(self.request, "You are already logged in.")
+            messages.warning(self.request, "You have already logged in.")
             return redirect("index")
         return super().dispatch(request, *args, **kwargs)
 
@@ -75,7 +75,7 @@ class Settings(TrendingMixin, LoginRequiredMixin, UpdateView):
 
     def form_valid(self, *args, **kwargs):
         messages.success(
-            self.request, "Your settings have been succesfully updated!"
+            self.request, "Your settings have been successfully updated!"
         )
         return super().form_valid(*args, **kwargs)
 
