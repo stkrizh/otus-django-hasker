@@ -128,10 +128,11 @@ class QuestionVote(AbstractVote):
 class Question(AbstractPost):
     vote_class = QuestionVote
 
+    number_of_answers = models.IntegerField(default=0)
+    tags = models.ManyToManyField("Tag")
     title = models.CharField(
         blank=False, max_length=settings.QUESTIONS_MAX_TITLE_LEN
     )
-    tags = models.ManyToManyField("Tag")
 
     def __str__(self):
         return self.title

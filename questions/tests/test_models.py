@@ -199,6 +199,22 @@ class TestQuestion(CreateDataMixin, TestCase):
         question.refresh_from_db()
         self.assertEqual(question.number_of_votes, number_of_votes + 2)
 
+    def test_number_of_answers_signals(self):
+        question = self.create_question()
+        self.assertEqual(question.number_of_answers, 0)
+
+        self.create_answer(question=question)
+        question.refresh_from_db()
+        self.assertEqual(question.number_of_answers, 1)
+
+        self.create_answer(question=question, user=self.create_user())
+        question.refresh_from_db()
+        self.assertEqual(question.number_of_answers, 2)
+
+        Answer.objects.filter(question=question).delete()
+        question.refresh_from_db()
+        self.assertEqual(question.number_of_answers, 0)
+
 
 class TestQuestionVote(CreateDataMixin, TestCase):
     def test_question_vote(self):

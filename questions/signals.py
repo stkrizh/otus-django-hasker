@@ -1,7 +1,24 @@
 from django.db.models import F
 from django.db.models.signals import post_delete, post_save
 
-from .models import AnswerVote, QuestionVote
+from .models import Answer, AnswerVote, Question, QuestionVote
+
+
+def answer_created(sender, instance, created, *args, **kwargs):
+    """ Update `number_of_answers` of `Question` model.
+    """
+    if created:
+        Question.objects.filter(pk=instance.question.pk).update(
+            number_of_answers=(F("number_of_answers") + 1)
+        )
+
+
+def answer_deleted(sender, instance, *args, **kwargs):
+    """ Update `number_of_answers` of `Question` model.
+    """
+    Question.objects.filter(pk=instance.question.pk).update(
+        number_of_answers=(F("number_of_answers") - 1)
+    )
 
 
 def vote_created(sender, instance, created, *args, **kwargs):
@@ -36,3 +53,6 @@ post_save.connect(vote_created, sender=AnswerVote)
 post_save.connect(vote_created, sender=QuestionVote)
 post_delete.connect(vote_deleted, sender=AnswerVote)
 post_delete.connect(vote_deleted, sender=QuestionVote)
+
+post_save.connect(answer_created, sender=Answer)
+post_delete.connect(answer_deleted, sender=Answer)
