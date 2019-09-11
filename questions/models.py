@@ -32,6 +32,7 @@ class AbstractPost(models.Model):
     content = models.TextField(blank=False)
     posted = models.DateTimeField(auto_now_add=True)
     rating = models.IntegerField(default=0)
+    number_of_votes = models.IntegerField(default=0)
 
     class Meta:
         abstract = True

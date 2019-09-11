@@ -62,6 +62,31 @@ class TestAnswerVote(CreateDataMixin, TestCase):
         self.assertEqual(rating_4, self.answer_1.rating)
         self.assertEqual(rating_4, 0)
 
+    def test_answer_number_of_votes(self):
+        answer = Answer.objects.create(
+            question=self.question, author=self.user, content="New Answer"
+        )
+
+        answer.vote(self.user, VOTE_UP)
+        answer.refresh_from_db()
+        self.assertEqual(answer.number_of_votes, 1)
+
+        answer.vote(self.user, VOTE_UP)
+        answer.refresh_from_db()
+        self.assertEqual(answer.number_of_votes, 1)
+
+        answer.vote(self.user, VOTE_DOWN)
+        answer.refresh_from_db()
+        self.assertEqual(answer.number_of_votes, 0)
+
+        answer.vote(self.user, VOTE_DOWN)
+        answer.refresh_from_db()
+        self.assertEqual(answer.number_of_votes, 1)
+
+        answer.vote(self.user, VOTE_UP)
+        answer.refresh_from_db()
+        self.assertEqual(answer.number_of_votes, 0)
+
     def test_rating_signals(self):
         self.answer_2.refresh_from_db()
         rating = self.answer_2.rating
@@ -85,6 +110,12 @@ class TestAnswerVote(CreateDataMixin, TestCase):
         vote.save(update_fields=["value"])
         self.answer_2.refresh_from_db()
         self.assertEqual(self.answer_2.rating, rating + 1)
+
+        AnswerVote.objects.create(
+            to=self.answer_2, user=self.create_user(), value=VOTE_UP
+        )
+        self.answer_2.refresh_from_db()
+        self.assertEqual(self.answer_2.rating, rating + 2)
 
 
 class TestQuestion(CreateDataMixin, TestCase):
@@ -123,8 +154,9 @@ class TestQuestion(CreateDataMixin, TestCase):
         self.assertEqual(questions[2].pk, trending_questions[2].pk)
 
     def test_add_tags(self):
-        question = Question(author=self.user, title="aaa", content="bbb")
+        question = Question(author=self.user, title="A", content="B")
 
+        # Question has not been saved to DB yet
         with self.assertRaises(ValueError):
             question.add_tags(["tag1", "tag2"], self.user)
 
@@ -135,6 +167,37 @@ class TestQuestion(CreateDataMixin, TestCase):
         self.assertEqual(
             set(raw_tags), set(question.tags.values_list("name", flat=True))
         )
+
+    def test_number_of_votes_signals(self):
+        question = self.create_question()
+        number_of_votes = self.question.number_of_votes
+        vote = QuestionVote.objects.create(
+            to=question, user=self.user, value=VOTE_UP
+        )
+
+        question.refresh_from_db()
+        self.assertEqual(question.number_of_votes, number_of_votes + 1)
+
+        QuestionVote.objects.filter(pk=vote.pk).delete()
+        question.refresh_from_db()
+        self.assertEqual(question.number_of_votes, number_of_votes)
+
+        vote = QuestionVote.objects.create(
+            to=question, user=self.user, value=VOTE_DOWN
+        )
+        question.refresh_from_db()
+        self.assertEqual(question.number_of_votes, number_of_votes + 1)
+
+        vote.value = VOTE_UP
+        vote.save(update_fields=["value"])
+        question.refresh_from_db()
+        self.assertEqual(question.number_of_votes, number_of_votes + 1)
+
+        QuestionVote.objects.create(
+            to=question, user=self.create_user(), value=VOTE_UP
+        )
+        question.refresh_from_db()
+        self.assertEqual(question.number_of_votes, number_of_votes + 2)
 
 
 class TestQuestionVote(CreateDataMixin, TestCase):

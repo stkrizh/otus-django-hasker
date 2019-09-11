@@ -12,7 +12,10 @@ def vote_created(sender, instance, created, *args, **kwargs):
     qs = post_model.objects.filter(pk=instance.to.pk)
 
     if created:
-        qs.update(rating=(F("rating") + instance.value))
+        qs.update(
+            rating=(F("rating") + instance.value),
+            number_of_votes=(F("number_of_votes") + 1),
+        )
     else:
         qs.update(rating=(F("rating") + 2 * instance.value))
 
@@ -23,7 +26,10 @@ def vote_deleted(sender, instance, *args, **kwargs):
     """
     post_model = type(instance.to)
     qs = post_model.objects.filter(pk=instance.to.pk)
-    qs.update(rating=(F("rating") - instance.value))
+    qs.update(
+        rating=(F("rating") - instance.value),
+        number_of_votes=(F("number_of_votes") - 1),
+    )
 
 
 post_save.connect(vote_created, sender=AnswerVote)
