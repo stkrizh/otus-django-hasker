@@ -101,7 +101,7 @@ class QuestionDetail(TrendingMixin, ListView):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        return queryset.filter(question=self.question)
+        return queryset.select_related("author").filter(question=self.question)
 
     def post(self, *args, **kwargs):
         if not self.request.user.is_authenticated:
@@ -122,6 +122,10 @@ class Questions(TrendingMixin, ListView):
     paginate_by = 10
     ordering = "-posted"
     template_name = "questions.html"
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        return qs.select_related("author")
 
 
 class QuestionsPopular(Questions):
