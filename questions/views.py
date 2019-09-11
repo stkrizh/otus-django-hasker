@@ -125,7 +125,7 @@ class Questions(TrendingMixin, ListView):
 
     def get_queryset(self):
         qs = super().get_queryset()
-        return qs.select_related("author")
+        return qs.select_related("author").prefetch_related("tags")
 
 
 class QuestionsPopular(Questions):

@@ -141,8 +141,7 @@ class Question(AbstractPost):
     def trending(cls, count: int = 5) -> models.QuerySet:
         """ Returns a query set of trending questions.
         """
-        qs = cls.objects.annotate(votes_count=models.Count("votes"))
-        return qs.order_by("-votes_count")[:count]
+        return cls.objects.order_by("-number_of_votes")[:count]
 
     def add_tags(self, tags: List[str], user) -> None:
         if self.pk is None:

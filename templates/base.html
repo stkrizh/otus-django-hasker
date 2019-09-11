@@ -76,7 +76,7 @@
                                     <div>
                                         <a class="uk-link-heading" href="{% url 'question_detail' question_id=question.pk %}">{{ question.title }}</a>
                                     </div>
-                                    <span class="uk-text-meta">{{ question.votes_count }} votes</span>
+                                    <span class="uk-text-meta">{{ question.number_of_votes }} votes</span>
                                 </div>
                                 {% endfor %}
                             </div>
