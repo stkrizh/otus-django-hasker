@@ -34,7 +34,7 @@
             {% endfor %}
         </div>
         <div class="uk-margin-top">
-            <a class="uk-button uk-button-text" href="{% url 'question_detail' question_id=question.pk %}">{{ question.answers.count }} answers</a>
+            <a class="uk-button uk-button-text" href="{% url 'question_detail' question_id=question.pk %}">{{ question.number_of_answers }} answers</a>
             <a class="uk-button uk-button-text uk-margin-left" href="{% url 'question_detail' question_id=question.pk %}">{{ question.number_of_votes }} votes</a>
         </div>
     </div>
