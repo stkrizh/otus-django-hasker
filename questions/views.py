@@ -19,7 +19,7 @@ class TrendingMixin:
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        context["trending"] = Question.trending()
+        context["trending"] = Question.trending(count=10)
         return context
 
 
@@ -56,7 +56,7 @@ class QuestionDetail(TrendingMixin, ListView):
     form = None
     model = Answer
     ordering = ("-is_accepted", "-rating", "-posted")
-    paginate_by = 3
+    paginate_by = 30
     template_name = "answers.html"
 
     def dispatch(self, *args, **kwargs):
@@ -119,7 +119,7 @@ class Questions(TrendingMixin, ListView):
     """
 
     model = Question
-    paginate_by = 10
+    paginate_by = 20
     ordering = "-posted"
     template_name = "questions.html"
 
