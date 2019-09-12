@@ -34,7 +34,7 @@
                             </div>
                             {% if request.user.is_authenticated %}
                             <div class="uk-flex uk-flex-middle">
-                                <a href="{% url 'settings' %}" class="userphoto uk-margin-right" style="background-image: url({{ request.user.get_photo_url }})"></a>
+                                <a href="{% url 'settings' %}" class="userphoto uk-margin-right" style="background-image: url({{ request.user.get_thumb_url }})"></a>
                                 <a href="{% url 'settings' %}">{{ request.user.username }}</a>
                             </div>
                             <div class="uk-flex uk-flex-middle">

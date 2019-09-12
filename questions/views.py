@@ -120,7 +120,7 @@ class Questions(TrendingMixin, ListView):
 
     model = Question
     paginate_by = 20
-    ordering = "-posted"
+    ordering = ("-posted", "-pk")
     template_name = "questions.html"
 
     def get_queryset(self):
