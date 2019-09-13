@@ -1,8 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.postgres.search import TrigramSimilarity
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models.functions import Greatest
+from django.db.models import Q
 from django.http import JsonResponse, HttpResponseForbidden, Http404
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy
@@ -158,13 +157,10 @@ class QuestionsSearch(Questions):
 
     def get_queryset(self):
         qs = super().get_queryset()
-        qs = qs.annotate(
-            similarity=Greatest(
-                TrigramSimilarity("title", self.query),
-                TrigramSimilarity("content", self.query),
-            )
+        qs = qs.filter(
+            Q(title__icontains=self.query) | Q(content__icontains=self.query)
         )
-        return qs.filter(similarity__gt=0.1)
+        return qs
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
