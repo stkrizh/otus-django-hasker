@@ -126,14 +126,18 @@ class TestQuestion(CreateDataMixin, TestCase):
             self.user_model(username="user3", email="user3@mail.fake"),
             self.user_model(username="user4", email="user4@mail.fake"),
         ]
-        self.user_model.objects.bulk_create(users)
+
+        for user in users:
+            user.save()
 
         questions = [
             Question(author=users[0], title="A0", content="B0"),
             Question(author=users[1], title="A1", content="B1"),
             Question(author=users[2], title="A2", content="B2"),
         ]
-        Question.objects.bulk_create(questions)
+
+        for question in questions:
+            question.save()
 
         questions[2].vote(users[0], VOTE_UP)
         questions[2].vote(users[1], VOTE_DOWN)

@@ -111,7 +111,7 @@ class TestQuestionSearch(CreateDataMixin, TestCase):
 
         client = Client()
         url = reverse("search")
-        response = client.get(url, data={"q": f" foo {unique_title} bar "})
+        response = client.get(url, data={"q": f"{unique_title}"})
         self.assertEqual(response.status_code, 200)
         self.assertInHTML(
             f'<p class="wrapword">{unique_content}</p>', str(response.content)
