@@ -79,5 +79,9 @@ class Settings(TrendingMixin, LoginRequiredMixin, UpdateView):
         )
         return super().form_valid(*args, **kwargs)
 
+    def form_invalid(self, *args, **kwargs):
+        self.object.refresh_from_db()
+        return super().form_invalid(*args, **kwargs)
+
     def get_object(self, queryset=None):
         return self.request.user

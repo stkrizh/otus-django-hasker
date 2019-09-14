@@ -3,8 +3,10 @@ from hashlib import md5
 
 from PIL import Image
 
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.contrib.staticfiles.templatetags.staticfiles import static
+from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db import models
@@ -19,9 +21,22 @@ def user_photo_path(instance, filename):
     return f"userpics/{new_filename}.{ext}"
 
 
+def user_photo_size_validator(photo):
+    max_size = settings.MAX_USER_PHOTO_SIZE_MB
+
+    if photo.size > max_size * 1024 * 1024:
+        raise ValidationError(f"The maximum file size is {max_size}MB")
+
+    return photo
+
+
 class User(AbstractUser):
     email = models.EmailField(max_length=254, unique=True)
-    photo = models.ImageField(blank=True, upload_to=user_photo_path)
+    photo = models.ImageField(
+        blank=True,
+        upload_to=user_photo_path,
+        validators=[user_photo_size_validator],
+    )
     thumb = models.ImageField(
         blank=True, editable=False, upload_to=user_photo_path
     )

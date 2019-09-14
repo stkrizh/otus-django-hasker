@@ -56,3 +56,4 @@ class VoteForm(forms.Form):
             raise forms.ValidationError("Target object doesn't exist.")
 
         self.cleaned_data["target"] = target
+        return target_id
