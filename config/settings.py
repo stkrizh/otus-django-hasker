@@ -26,6 +26,10 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
 ]
 
+# 3rd party apps
+
+INSTALLED_APPS += ["rest_framework"]
+
 # Project applications
 
 INSTALLED_APPS += [
@@ -116,13 +120,7 @@ USE_TZ = True
 
 # Custom messages tags
 
-MESSAGE_TAGS = {
-    10: "debug",
-    20: "info",
-    25: "success",
-    30: "warning",
-    40: "danger",
-}
+MESSAGE_TAGS = {10: "debug", 20: "info", 25: "success", 30: "warning", 40: "danger"}
 
 
 # Static files (CSS, JavaScript, Images)
@@ -136,6 +134,14 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+
+
+# DRF settings
+
+REST_FRAMEWORK = {
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 10,
+}
 
 
 # App settings
