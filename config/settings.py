@@ -28,7 +28,7 @@ INSTALLED_APPS = [
 
 # 3rd party apps
 
-INSTALLED_APPS += ["rest_framework"]
+INSTALLED_APPS += ["rest_framework", "rest_framework.authtoken"]
 
 # Project applications
 
@@ -120,7 +120,13 @@ USE_TZ = True
 
 # Custom messages tags
 
-MESSAGE_TAGS = {10: "debug", 20: "info", 25: "success", 30: "warning", 40: "danger"}
+MESSAGE_TAGS = {
+    10: "debug",
+    20: "info",
+    25: "success",
+    30: "warning",
+    40: "danger",
+}
 
 
 # Static files (CSS, JavaScript, Images)
@@ -139,6 +145,10 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 # DRF settings
 
 REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.SessionAuthentication",
+        "rest_framework.authentication.TokenAuthentication",
+    ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 10,
 }
