@@ -13,7 +13,7 @@ from .forms import LogInForm, SettingsForm, SignUpForm
 class LogIn(TrendingMixin, FormView):
     form_class = LogInForm
     success_url = reverse_lazy("index")
-    template_name = "users/login.html"
+    template_name = "login.html"
 
     def post(self, request, *args, **kwargs):
         if self.request.user.is_authenticated:
@@ -51,7 +51,7 @@ class SignUp(TrendingMixin, CreateView):
     form_class = SignUpForm
     model = get_user_model()
     success_url = reverse_lazy("index")
-    template_name = "users/signup.html"
+    template_name = "signup.html"
 
     def dispatch(self, request, *args, **kwargs):
         if self.request.user.is_authenticated:
@@ -71,7 +71,7 @@ class Settings(TrendingMixin, LoginRequiredMixin, UpdateView):
     form_class = SettingsForm
     login_url = reverse_lazy("login")
     success_url = reverse_lazy("settings")
-    template_name = "users/settings.html"
+    template_name = "settings.html"
 
     def form_valid(self, *args, **kwargs):
         messages.success(
