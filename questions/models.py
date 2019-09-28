@@ -55,35 +55,28 @@ class AbstractPost(models.Model):
         return self.rating + value
 
 
-class AbstractVote(models.Model):
-    """ Abstract model that represents user votes for questions and answers.
-    """
-
+class AnswerVote(models.Model):
     timestamp = models.DateTimeField(auto_now=True)
-    value = models.SmallIntegerField(choices=VOTE_CHOICES)
-    user = models.ForeignKey(
-        to=User,
-        on_delete=models.CASCADE,
-        related_name="%(class)ss",
-        related_query_name="%(class)s",
-    )
-
-    class Meta:
-        abstract = True
-        ordering = ["-timestamp"]
-        unique_together = ["to", "user"]
-
-    def __str__(self):
-        return f"{self.user.username} {self.value:+d}"
-
-
-class AnswerVote(AbstractVote):
     to = models.ForeignKey(
         "Answer",
         on_delete=models.CASCADE,
         related_name="votes",
         related_query_name="votes",
     )
+    user = models.ForeignKey(
+        to=User,
+        on_delete=models.CASCADE,
+        related_name="%(class)ss",
+        related_query_name="%(class)s",
+    )
+    value = models.SmallIntegerField(choices=VOTE_CHOICES)
+
+    class Meta:
+        ordering = ["-timestamp"]
+        unique_together = ["to", "user"]
+
+    def __str__(self):
+        return f"{self.user.username} {self.value:+d}"
 
 
 class Answer(AbstractPost):
@@ -114,13 +107,28 @@ class Answer(AbstractPost):
         self.save(update_fields=["is_accepted"])
 
 
-class QuestionVote(AbstractVote):
+class QuestionVote(models.Model):
+    timestamp = models.DateTimeField(auto_now=True)
     to = models.ForeignKey(
         "Question",
         on_delete=models.CASCADE,
         related_name="votes",
         related_query_name="votes",
     )
+    user = models.ForeignKey(
+        to=User,
+        on_delete=models.CASCADE,
+        related_name="%(class)ss",
+        related_query_name="%(class)s",
+    )
+    value = models.SmallIntegerField(choices=VOTE_CHOICES)
+
+    class Meta:
+        ordering = ["-timestamp"]
+        unique_together = ["to", "user"]
+
+    def __str__(self):
+        return f"{self.user.username} {self.value:+d}"
 
 
 class Question(AbstractPost):
