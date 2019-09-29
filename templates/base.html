@@ -6,15 +6,8 @@
         <title>Hasker</title>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <!-- UIkit CSS -->
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.1.7/css/uikit.min.css" />
-        <!-- UIkit JS -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.1.7/js/uikit.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.1.7/js/uikit-icons.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-
-        <script src="{% static 'js/main.js' %}?t={% now 'u' %}"></script>
-        <link rel="stylesheet" type="text/css" href="{% static 'css/main.css' %}?t={% now 'u' %}">
+        <link rel="stylesheet" href="{% static 'css/uikit.min.css' %}" />
+        <link rel="stylesheet" href="{% static 'css/main.css' %}">
     </head>
     <body>
         <div class="wrapper">
@@ -34,7 +27,9 @@
                             </div>
                             {% if request.user.is_authenticated %}
                             <div class="uk-flex uk-flex-middle">
-                                <a href="{% url 'settings' %}" class="userphoto uk-margin-right" style="background-image: url({{ request.user.get_thumb_url }})"></a>
+                                <a href="{% url 'settings' %}" class="userphoto uk-margin-right">
+                                    <img src="{{ request.user.get_thumb_url }}">
+                                </a>
                                 <a href="{% url 'settings' %}">{{ request.user.username }}</a>
                             </div>
                             <div class="uk-flex uk-flex-middle">
@@ -90,5 +85,11 @@
                 <a href="{% url 'index' %}">Hasker - Poor Man's Stackoverflow</a>
             </div>
         </div>
+
+        <!-- JS -->
+        <script src="{% static 'js/jquery.min.js' %}"></script>
+        <script src="{% static 'js/uikit.min.js' %}"></script>
+        <script src="{% static 'js/uikit-icons.min.js' %}"></script>
+        <script src="{% static 'js/main.js' %}"></script>
     </body>
 </html>
