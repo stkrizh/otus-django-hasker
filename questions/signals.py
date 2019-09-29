@@ -1,7 +1,12 @@
+import logging
+
 from django.db.models import F
 from django.db.models.signals import post_delete, post_save
 
 from .models import Answer, AnswerVote, Question, QuestionVote
+
+
+logger = logging.getLogger(__name__)
 
 
 def answer_created(sender, instance, created, raw, *args, **kwargs):
@@ -11,6 +16,10 @@ def answer_created(sender, instance, created, raw, *args, **kwargs):
         Question.objects.filter(pk=instance.question.pk).update(
             number_of_answers=(F("number_of_answers") + 1)
         )
+        logger.debug(
+            f"Number of answers has been increased "
+            f"for {instance.question.pk}"
+        )
 
 
 def answer_deleted(sender, instance, *args, **kwargs):
@@ -18,6 +27,10 @@ def answer_deleted(sender, instance, *args, **kwargs):
     """
     Question.objects.filter(pk=instance.question.pk).update(
         number_of_answers=(F("number_of_answers") - 1)
+    )
+    logger.debug(
+        f"Number of answers has been decreased "
+        f"for {instance.question.pk}. Answer has been deleted"
     )
 
 
@@ -33,8 +46,15 @@ def vote_created(sender, instance, created, raw, *args, **kwargs):
             rating=(F("rating") + instance.value),
             number_of_votes=(F("number_of_votes") + 1),
         )
+        logger.debug(
+            f"Number of votes / rating have been changed "
+            f"for {post_model} ({instance.pk})"
+        )
     else:
         qs.update(rating=(F("rating") + 2 * instance.value))
+        logger.debug(
+            f"Rating has been changed for {post_model} ({instance.pk})"
+        )
 
 
 def vote_deleted(sender, instance, *args, **kwargs):
@@ -46,6 +66,10 @@ def vote_deleted(sender, instance, *args, **kwargs):
     qs.update(
         rating=(F("rating") - instance.value),
         number_of_votes=(F("number_of_votes") - 1),
+    )
+    logger.debug(
+        f"Rating has been changed for {post_model} ({instance.pk}). "
+        f"Vote has been deleted"
     )
 
 

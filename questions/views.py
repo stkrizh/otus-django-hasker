@@ -1,3 +1,5 @@
+import logging
+
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist
@@ -11,6 +13,9 @@ from django.views.generic import CreateView, FormView, ListView, View
 from .forms import AnswerForm, AskForm, VoteForm
 from .models import Answer, Question
 from .utils import send_notification_about_new_answer
+
+
+logger = logging.getLogger(__name__)
 
 
 class TrendingMixin:
@@ -47,6 +52,12 @@ class Ask(TrendingMixin, LoginRequiredMixin, CreateView):
         messages.success(
             self.request, "Your question has been added successfully!"
         )
+
+        logger.debug(
+            f"New question ({question.pk}) has been "
+            f"added successfully by {question.author}"
+        )
+
         return redirect(self.success_url)
 
 
@@ -87,6 +98,12 @@ class QuestionDetail(TrendingMixin, ListView):
 
         send_notification_about_new_answer(
             self.request, self.question.author.email, self.question.pk
+        )
+
+        logger.debug(
+            f"New answer ({answer.pk}) has been "
+            f"added successfully by {answer.author} "
+            f"for question ({self.question.pk})"
         )
 
         messages.success(self.request, "Thank you for your answer!")
