@@ -1,6 +1,11 @@
+import logging
+
 from django.conf import settings
 from django.urls import reverse
 from django.core.mail import send_mail
+
+
+logger = logging.getLogger(__name__)
 
 
 def send_notification_about_new_answer(
@@ -22,3 +27,4 @@ def send_notification_about_new_answer(
         fail_silently=False,
         html_message=message,
     )
+    logger.debug(f"Email about new answer has been sent to {to}")

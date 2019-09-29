@@ -1,0 +1,29 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hasker</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- UIkit CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.1.7/css/uikit.min.css" />
+    <!-- UIkit JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.1.7/js/uikit.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.1.7/js/uikit-icons.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+    <script src="{% static 'js/main.js' %}?t={% now 'u' %}"></script>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/main.css' %}?t={% now 'u' %}">
+</head>
+
+<body>
+    <div class="uk-margin-top">
+        <h1 class="uk-heading-large uk-text-primary uk-text-center">{% block error_code %}{% endblock error_code %}</h1>
+        <hr>
+        <h3 class="uk-align-center uk-text-muted uk-text-center">{% block error_message %}{% endblock error_message %}</h3>
+    </div>
+    <div class="uk-margin-top uk-text-center">
+        <a href="{% url 'index'%}">Main Page</a>
+    </div>
+</body>
+</html>

@@ -1,6 +1,9 @@
+import logging
+
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist
+from django.db import transaction
 from django.db.models import Q
 from django.http import JsonResponse, HttpResponseForbidden, Http404
 from django.shortcuts import redirect, get_object_or_404
@@ -10,6 +13,9 @@ from django.views.generic import CreateView, FormView, ListView, View
 from .forms import AnswerForm, AskForm, VoteForm
 from .models import Answer, Question
 from .utils import send_notification_about_new_answer
+
+
+logger = logging.getLogger(__name__)
 
 
 class TrendingMixin:
@@ -32,6 +38,7 @@ class Ask(TrendingMixin, LoginRequiredMixin, CreateView):
     template_name = "ask.html"
     success_url = reverse_lazy("index")
 
+    @transaction.atomic
     def form_valid(self, form):
         """If the form is valid, save the question and its tags.
         """
@@ -45,6 +52,12 @@ class Ask(TrendingMixin, LoginRequiredMixin, CreateView):
         messages.success(
             self.request, "Your question has been added successfully!"
         )
+
+        logger.debug(
+            f"New question ({question.pk}) has been "
+            f"added successfully by {question.author}"
+        )
+
         return redirect(self.success_url)
 
 
@@ -74,6 +87,7 @@ class QuestionDetail(TrendingMixin, ListView):
         )
         return super().get(self.request)
 
+    @transaction.atomic
     def form_valid(self, form):
         """ If the form is valid, save the answer.
         """
@@ -84,6 +98,12 @@ class QuestionDetail(TrendingMixin, ListView):
 
         send_notification_about_new_answer(
             self.request, self.question.author.email, self.question.pk
+        )
+
+        logger.debug(
+            f"New answer ({answer.pk}) has been "
+            f"added successfully by {answer.author} "
+            f"for question ({self.question.pk})"
         )
 
         messages.success(self.request, "Thank you for your answer!")
@@ -200,6 +220,7 @@ class QuestionVote(FormView):
     def form_invalid(self, form):
         return JsonResponse(data=form.errors, status=400)
 
+    @transaction.atomic
     def form_valid(self, form):
         target = form.cleaned_data["target"]
         value = form.cleaned_data["value"]
@@ -222,6 +243,7 @@ class AnswerMark(View):
 
     http_method_names = ("post",)
 
+    @transaction.atomic
     def post(self, *args, **kwargs):
         if not self.request.user.is_authenticated:
             return HttpResponseForbidden()

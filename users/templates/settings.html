@@ -8,7 +8,7 @@
     <form method="POST" class="uk-form-stacked" enctype="multipart/form-data">
         <div class="uk-margin">
             <div class="uk-inline uk-width-1-1 uk-flex uk-flex-row uk-flex-middle">
-                <div class="userphoto userphoto--big" style="background-image: url({{ object.get_photo_url }})"></div>
+                <img class="userphoto userphoto--big" src="{{ object.get_photo_url }}">
                 <span class="uk-margin-left">{{ object.username }}</span>
             </div>
         </div>

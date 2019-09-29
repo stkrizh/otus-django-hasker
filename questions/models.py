@@ -1,3 +1,5 @@
+import logging
+
 from typing import List, Optional
 
 from django.conf import settings
@@ -12,6 +14,7 @@ VOTE_CHOICES = ((VOTE_UP, "Vote Up"), (VOTE_DOWN, "Vote Down"))
 
 
 User = get_user_model()
+logger = logging.getLogger(__name__)
 
 
 class AbstractPost(models.Model):
@@ -46,44 +49,41 @@ class AbstractPost(models.Model):
             current = self.vote_class.objects.get(user=user, to=self)
         except ObjectDoesNotExist:
             self.vote_class.objects.create(user=user, to=self, value=value)
+            logger.debug(
+                f"New vote ({value}) by {user} hase been created for {self}"
+            )
             return self.rating + value
 
         if current.value == value:
             return self.rating
 
         self.vote_class.objects.filter(to=self, user=user).delete()
+        logger.debug(f"Vote by {user} has been deleted for {self}")
         return self.rating + value
 
 
-class AbstractVote(models.Model):
-    """ Abstract model that represents user votes for questions and answers.
-    """
-
+class AnswerVote(models.Model):
     timestamp = models.DateTimeField(auto_now=True)
-    value = models.SmallIntegerField(choices=VOTE_CHOICES)
-    user = models.ForeignKey(
-        to=User,
-        on_delete=models.CASCADE,
-        related_name="%(class)ss",
-        related_query_name="%(class)s",
-    )
-
-    class Meta:
-        abstract = True
-        ordering = ["-timestamp"]
-        unique_together = ["to", "user"]
-
-    def __str__(self):
-        return f"{self.user.username} {self.value:+d}"
-
-
-class AnswerVote(AbstractVote):
     to = models.ForeignKey(
         "Answer",
         on_delete=models.CASCADE,
         related_name="votes",
         related_query_name="votes",
     )
+    user = models.ForeignKey(
+        to=User,
+        on_delete=models.CASCADE,
+        related_name="%(class)ss",
+        related_query_name="%(class)s",
+    )
+    value = models.SmallIntegerField(choices=VOTE_CHOICES)
+
+    class Meta:
+        ordering = ["-timestamp"]
+        unique_together = ["to", "user"]
+
+    def __str__(self):
+        return f"{self.user.username} {self.value:+d}"
 
 
 class Answer(AbstractPost):
@@ -106,21 +106,44 @@ class Answer(AbstractPost):
         self.question.answers.update(is_accepted=False)
         self.is_accepted = True
         self.save(update_fields=["is_accepted"])
+        logger.debug(
+            f"Answer ({self.pk}) by {self.author} has been marked "
+            f"for question ({self.question.pk})."
+        )
 
     def unmark(self):
         """ Unmark acceptance from the answer.
         """
         self.is_accepted = False
         self.save(update_fields=["is_accepted"])
+        logger.debug(
+            f"Answer ({self.pk}) by {self.author} has been unmarked "
+            f"for question ({self.question.pk})."
+        )
 
 
-class QuestionVote(AbstractVote):
+class QuestionVote(models.Model):
+    timestamp = models.DateTimeField(auto_now=True)
     to = models.ForeignKey(
         "Question",
         on_delete=models.CASCADE,
         related_name="votes",
         related_query_name="votes",
     )
+    user = models.ForeignKey(
+        to=User,
+        on_delete=models.CASCADE,
+        related_name="%(class)ss",
+        related_query_name="%(class)s",
+    )
+    value = models.SmallIntegerField(choices=VOTE_CHOICES)
+
+    class Meta:
+        ordering = ["-timestamp"]
+        unique_together = ["to", "user"]
+
+    def __str__(self):
+        return f"{self.user.username} {self.value:+d}"
 
 
 class Question(AbstractPost):
@@ -151,6 +174,8 @@ class Question(AbstractPost):
                 tag = Tag.objects.create(added=user, name=raw_tag)
 
             self.tags.add(tag)
+
+        logger.debug(f"Tags ({tags}) have been added to question {self.pk}")
 
 
 class Tag(models.Model):

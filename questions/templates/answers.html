@@ -51,7 +51,7 @@
                     {% if request.user == question.author %}
                     <div class="uk-margin-right answer-mark {% if answer.is_accepted %}answer-mark--marked{% endif %}" data-url="{% url 'answer_mark' answer_id=answer.pk %}" uk-icon="icon: star; ratio: 2"></div>
                     {% endif %}
-                    <div class="uk-comment-avatar userphoto userphoto-mid" style="background-image: url({{ answer.author.get_thumb_url }})"></div>
+                    <img class="uk-comment-avatar userphoto userphoto-mid" src="{{ answer.author.get_thumb_url }}">
                 </div>
                 <div class="uk-width-expand">
                     <h4 class="uk-comment-title uk-margin-remove"><a class="uk-link-reset" href="#">{{ answer.author.username }}</a></h4>
