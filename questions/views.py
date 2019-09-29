@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist
+from django.db import transaction
 from django.db.models import Q
 from django.http import JsonResponse, HttpResponseForbidden, Http404
 from django.shortcuts import redirect, get_object_or_404
@@ -32,6 +33,7 @@ class Ask(TrendingMixin, LoginRequiredMixin, CreateView):
     template_name = "ask.html"
     success_url = reverse_lazy("index")
 
+    @transaction.atomic
     def form_valid(self, form):
         """If the form is valid, save the question and its tags.
         """
@@ -74,6 +76,7 @@ class QuestionDetail(TrendingMixin, ListView):
         )
         return super().get(self.request)
 
+    @transaction.atomic
     def form_valid(self, form):
         """ If the form is valid, save the answer.
         """
@@ -200,6 +203,7 @@ class QuestionVote(FormView):
     def form_invalid(self, form):
         return JsonResponse(data=form.errors, status=400)
 
+    @transaction.atomic
     def form_valid(self, form):
         target = form.cleaned_data["target"]
         value = form.cleaned_data["value"]
@@ -222,6 +226,7 @@ class AnswerMark(View):
 
     http_method_names = ("post",)
 
+    @transaction.atomic
     def post(self, *args, **kwargs):
         if not self.request.user.is_authenticated:
             return HttpResponseForbidden()
