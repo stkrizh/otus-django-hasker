@@ -1,13 +1,19 @@
+from django.conf import settings
 from django.contrib.auth import get_user_model
 
 from rest_framework import serializers
 
-from questions.models import Answer, Question, Tag
+from questions.models import Answer, Question
 
 
 class QuestionTagsField(serializers.ListField):
     def get_attribute(self, question):
         return [str(tag) for tag in question.tags.all()]
+
+    def run_validation(self, data):
+        tags = (tag.strip().lower() for tag in data)
+        tags = set(filter(bool, tags))
+        return super().run_validation(sorted(tags))
 
 
 class AuthorSerializer(serializers.ModelSerializer):
@@ -25,20 +31,30 @@ class AuthorSerializer(serializers.ModelSerializer):
         return user.get_thumb_url()
 
 
-class QuestionSerializer(serializers.Serializer):
-    title = serializers.CharField()
-    content = serializers.CharField()
-    tags = QuestionTagsField(
-        child=serializers.CharField(), allow_empty=True, max_length=3
-    )
+class QuestionSerializer(serializers.ModelSerializer):
     author = AuthorSerializer(read_only=True)
-    number_of_answers = serializers.IntegerField(read_only=True)
-    number_of_votes = serializers.IntegerField(read_only=True)
-    rating = serializers.IntegerField(read_only=True)
-    posted = serializers.DateTimeField(read_only=True)
+    tags = QuestionTagsField(
+        child=serializers.CharField(max_length=settings.QUESTIONS_MAX_TAG_LEN),
+        allow_empty=True,
+        max_length=settings.QUESTIONS_MAX_NUMBER_OF_TAGS,
+    )
+
+    class Meta:
+        model = Question
+        fields = "__all__"
+        read_only_fields = [
+            "author",
+            "number_of_answers",
+            "number_of_votes",
+            "posted",
+            "rating",
+        ]
 
     def create(self, validated_data):
-        import ipdb; ipdb.set_trace()
+        tags = validated_data.pop("tags")
+        new_question = super().create(validated_data)
+        new_question.add_tags(tags, new_question.author)
+        return new_question
 
 
 class AnswerSerializer(serializers.ModelSerializer):
