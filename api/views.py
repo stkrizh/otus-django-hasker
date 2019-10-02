@@ -1,10 +1,8 @@
 from django.shortcuts import get_object_or_404
 
 from rest_framework import filters
-from rest_framework import status
 from rest_framework.generics import ListCreateAPIView, RetrieveAPIView
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
-from rest_framework.response import Response
 
 from questions.models import Answer, Question
 
@@ -80,6 +78,7 @@ class QuestionDetailsAPIView(RetrieveAPIView):
 
 
 class AnswersAPIView(ListCreateAPIView):
+    ordering = ["-is_accepted", "-rating", "-posted"]
     permission_classes = [IsAuthenticatedOrReadOnly]
     serializer_class = AnswerSerializer
 
@@ -93,7 +92,6 @@ class AnswersAPIView(ListCreateAPIView):
     def get_queryset(self):
         queryset = Answer.objects.all()
         queryset = queryset.filter(question=self.question)
-        queryset = queryset.order_by("-is_accepted", "-rating", "-posted")
 
         return queryset
 
