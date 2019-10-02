@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404
 
+from rest_framework import filters
 from rest_framework import status
 from rest_framework.generics import ListCreateAPIView, RetrieveAPIView
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
@@ -10,6 +11,20 @@ from questions.models import Answer, Question
 from .serializers import AnswerSerializer, QuestionSerializer
 
 
+class TagFilter(filters.BaseFilterBackend):
+    """ Filter questions by specified tag.
+    """
+
+    def filter_queryset(self, request, queryset, view):
+        tag = request.query_params.get("tag", "")
+        tag = tag.strip().lower()
+
+        if not tag:
+            return queryset
+
+        return queryset.filter(tags__name=tag)
+
+
 class QuestionsAPIView(ListCreateAPIView):
     VALID_SORTS = {
         "latest": "-posted",
@@ -17,7 +32,9 @@ class QuestionsAPIView(ListCreateAPIView):
         "trending": "-number_of_votes",
     }
 
+    filter_backends = [TagFilter, filters.SearchFilter]
     permission_classes = [IsAuthenticatedOrReadOnly]
+    search_fields = ["title", "content"]
     serializer_class = QuestionSerializer
 
     def get(self, request, *args, **kwargs):
