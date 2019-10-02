@@ -11,7 +11,7 @@ from questions.models import Answer, Question
 from .serializers import AnswerSerializer, QuestionSerializer
 
 
-class TagFilter(filters.BaseFilterBackend):
+class QuestionsTagFilter(filters.BaseFilterBackend):
     """ Filter questions by specified tag.
     """
 
@@ -25,25 +25,36 @@ class TagFilter(filters.BaseFilterBackend):
         return queryset.filter(tags__name=tag)
 
 
-class QuestionsAPIView(ListCreateAPIView):
+class QuestionsOrderingFilter(filters.BaseFilterBackend):
+    """ Ordering for questions.
+    """
+
     VALID_SORTS = {
         "latest": "-posted",
         "popular": "-rating",
         "trending": "-number_of_votes",
     }
 
-    filter_backends = [TagFilter, filters.SearchFilter]
+    def filter_queryset(self, request, queryset, view):
+        sort = request.query_params.get("sort", "")
+        sort = sort.strip().lower()
+
+        if sort not in self.VALID_SORTS:
+            return queryset
+
+        return queryset.order_by(self.VALID_SORTS[sort])
+
+
+class QuestionsAPIView(ListCreateAPIView):
+
+    filter_backends = [
+        QuestionsOrderingFilter,
+        QuestionsTagFilter,
+        filters.SearchFilter,
+    ]
     permission_classes = [IsAuthenticatedOrReadOnly]
     search_fields = ["title", "content"]
     serializer_class = QuestionSerializer
-
-    def get(self, request, *args, **kwargs):
-        self.sort = request.query_params.get("sort", "latest")
-
-        if self.sort not in self.VALID_SORTS:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
-        return super().get(request, *args, **kwargs)
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
@@ -52,7 +63,6 @@ class QuestionsAPIView(ListCreateAPIView):
         queryset = Question.objects.all()
         queryset = queryset.select_related("author")
         queryset = queryset.prefetch_related("tags")
-        queryset = queryset.order_by(self.VALID_SORTS[self.sort])
 
         return queryset
 
