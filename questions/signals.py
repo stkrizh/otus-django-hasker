@@ -1,6 +1,6 @@
 import logging
 
-from django.db.models import F
+from django.db.models import F, Sum
 from django.db.models.signals import post_delete, post_save
 
 from .models import Answer, AnswerVote, Question, QuestionVote
@@ -41,7 +41,10 @@ def vote_created(sender, instance, created, raw, *args, **kwargs):
     post_model = type(instance.to)
     qs = post_model.objects.filter(pk=instance.to.pk)
 
-    if created and not raw:
+    if raw:
+        return None
+
+    if created:
         qs.update(
             rating=(F("rating") + instance.value),
             number_of_votes=(F("number_of_votes") + 1),
@@ -51,10 +54,15 @@ def vote_created(sender, instance, created, raw, *args, **kwargs):
             f"for {post_model} ({instance.pk})"
         )
     else:
-        qs.update(rating=(F("rating") + 2 * instance.value))
-        logger.debug(
-            f"Rating has been changed for {post_model} ({instance.pk})"
-        )
+        model = type(instance)
+        query = model.objects.filter(to=instance.to).aggregate(Sum("value"))
+        new_rating = query["value__sum"]
+
+        if new_rating is not None:
+            qs.update(rating=new_rating)
+            logger.debug(
+                f"Rating has been changed for {post_model} ({instance.pk})"
+            )
 
 
 def vote_deleted(sender, instance, *args, **kwargs):
