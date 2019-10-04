@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 
 from rest_framework import serializers
 
-from questions.models import Answer, Question
+from questions.models import Answer, AnswerVote, Question, QuestionVote
 
 
 class QuestionTagsField(serializers.ListField):
@@ -16,7 +16,7 @@ class QuestionTagsField(serializers.ListField):
         return super().run_validation(sorted(tags))
 
 
-class AuthorSerializer(serializers.ModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
     photo_big_url = serializers.SerializerMethodField()
     photo_small_url = serializers.SerializerMethodField()
 
@@ -32,7 +32,7 @@ class AuthorSerializer(serializers.ModelSerializer):
 
 
 class QuestionSerializer(serializers.ModelSerializer):
-    author = AuthorSerializer(read_only=True)
+    author = UserSerializer(read_only=True)
     tags = QuestionTagsField(
         child=serializers.CharField(max_length=settings.QUESTIONS_MAX_TAG_LEN),
         allow_empty=True,
@@ -58,7 +58,7 @@ class QuestionSerializer(serializers.ModelSerializer):
 
 
 class AnswerSerializer(serializers.ModelSerializer):
-    author = AuthorSerializer(read_only=True)
+    author = UserSerializer(read_only=True)
 
     class Meta:
         model = Answer
@@ -71,3 +71,36 @@ class AnswerSerializer(serializers.ModelSerializer):
             "question",
             "rating",
         ]
+
+
+class AnswerVoteSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+
+    class Meta:
+        model = AnswerVote
+        exclude = ["to"]
+        read_only_fields = [
+            "user",
+            "timestamp",
+            "to"
+        ]
+
+
+class QuestionVoteSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+
+    class Meta:
+        model = QuestionVote
+        exclude = ["to"]
+        read_only_fields = [
+            "user",
+            "timestamp",
+        ]
+
+    def validate(self, data):
+        question_pk = self.context["view"].kwargs["pk"]
+        user = self.context["request"].user
+
+        if QuestionVote.objects.filter(to=question_pk, user=user).exists():
+            raise serializers.ValidationError("Vote already exists.")
+        return data

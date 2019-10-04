@@ -1,12 +1,22 @@
 from django.shortcuts import get_object_or_404
 
 from rest_framework import filters
-from rest_framework.generics import ListCreateAPIView, RetrieveAPIView
+from rest_framework.generics import (
+    ListCreateAPIView,
+    RetrieveAPIView,
+    RetrieveUpdateDestroyAPIView,
+)
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
-from questions.models import Answer, Question
+from questions.models import Answer, AnswerVote, Question, QuestionVote
 
-from .serializers import AnswerSerializer, QuestionSerializer
+from .permissions import IsOwnerOrReadOnly
+from .serializers import (
+    AnswerSerializer,
+    AnswerVoteSerializer,
+    QuestionSerializer,
+    QuestionVoteSerializer,
+)
 
 
 class QuestionsTagFilter(filters.BaseFilterBackend):
@@ -73,6 +83,48 @@ class QuestionDetailsAPIView(RetrieveAPIView):
         queryset = Question.objects.all()
         queryset = queryset.select_related("author")
         queryset = queryset.prefetch_related("tags")
+
+        return queryset
+
+
+class QuestionVotesAPIView(ListCreateAPIView):
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    serializer_class = QuestionVoteSerializer
+
+    def initial(self, request, *args, **kwargs):
+        """
+        Runs anything that needs to occur prior to calling the method handler.
+        """
+        super().initial(request, *args, **kwargs)
+        self.question = get_object_or_404(Question, pk=self.kwargs.get("pk"))
+
+    def get_queryset(self):
+        queryset = QuestionVote.objects.all()
+        queryset = queryset.select_related("user")
+        queryset = queryset.filter(to=self.question)
+
+        return queryset
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user, to=self.question)
+
+
+class QuestionVoteDetailAPIView(RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+    serializer_class = QuestionVoteSerializer
+
+    def initial(self, request, *args, **kwargs):
+        """
+        Runs anything that needs to occur prior to calling the method handler.
+        """
+        super().initial(request, *args, **kwargs)
+        self.question = get_object_or_404(
+            Question, pk=self.kwargs.get("question_pk")
+        )
+
+    def get_queryset(self):
+        queryset = QuestionVote.objects.filter(to=self.question)
+        queryset = queryset.select_related("user")
 
         return queryset
 

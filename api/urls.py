@@ -18,4 +18,14 @@ urlpatterns = [
         views.AnswersAPIView.as_view(),
         name="api_answers",
     ),
+    path(
+        "questions/<int:pk>/votes",
+        views.QuestionVotesAPIView.as_view(),
+        name="api_question_votes",
+    ),
+    path(
+        "questions/<int:question_pk>/votes/<int:pk>",
+        views.QuestionVoteDetailAPIView.as_view(),
+        name="api_question_vote_details",
+    ),
 ]
