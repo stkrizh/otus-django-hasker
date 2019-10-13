@@ -25,7 +25,22 @@ urlpatterns = [
     ),
     path(
         "questions/<int:question_pk>/votes/<int:pk>",
-        views.QuestionVoteDetailAPIView.as_view(),
+        views.QuestionVoteDetailsAPIView.as_view(),
         name="api_question_vote_details",
+    ),
+    path(
+        "answers/<int:pk>",
+        views.AnswerDetailsAPIView.as_view(),
+        name="api_answer_details",
+    ),
+    path(
+        "answers/<int:pk>/votes",
+        views.AnswerVotesAPIView.as_view(),
+        name="api_answer_votes",
+    ),
+    path(
+        "answers/<int:answer_pk>/votes/<int:pk>",
+        views.AnswerVoteDetailsAPIView.as_view(),
+        name="api_answer_vote_details",
     ),
 ]

@@ -82,8 +82,15 @@ class AnswerVoteSerializer(serializers.ModelSerializer):
         read_only_fields = [
             "user",
             "timestamp",
-            "to"
         ]
+
+    def validate(self, data):
+        answer_pk = self.context["view"].kwargs["pk"]
+        user = self.context["request"].user
+
+        if AnswerVote.objects.filter(to=answer_pk, user=user).exists():
+            raise serializers.ValidationError("Vote already exists.")
+        return data
 
 
 class QuestionVoteSerializer(serializers.ModelSerializer):
