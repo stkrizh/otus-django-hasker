@@ -1,4 +1,5 @@
 from django.urls import path
+from django.views.generic import TemplateView
 
 from rest_framework.authtoken.views import obtain_auth_token
 
@@ -42,5 +43,21 @@ urlpatterns = [
         "answers/<int:answer_pk>/votes/<int:pk>",
         views.AnswerVoteDetailsAPIView.as_view(),
         name="api_answer_vote_details",
+    ),
+]
+
+
+urlpatterns += [
+    path(
+        "swagger-ui/",
+        TemplateView.as_view(template_name="swagger-ui.html"),
+        name="swagger-ui",
+    ),
+    path(
+        "swagger.json",
+        TemplateView.as_view(
+            template_name="swagger.json", content_type="application/json"
+        ),
+        name="swagger",
     ),
 ]
