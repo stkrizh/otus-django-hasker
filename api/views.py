@@ -4,15 +4,17 @@ from rest_framework import filters
 from rest_framework.generics import (
     ListCreateAPIView,
     RetrieveAPIView,
+    RetrieveUpdateAPIView,
     RetrieveUpdateDestroyAPIView,
 )
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 from questions.models import Answer, AnswerVote, Question, QuestionVote
 
-from .permissions import IsOwnerOrReadOnly
+from .permissions import IsOwnerOfQuestionOrReadOnly, IsOwnerOrReadOnly
 from .serializers import (
     AnswerSerializer,
+    AnswerDetailSerializer,
     AnswerVoteSerializer,
     QuestionSerializer,
     QuestionVoteSerializer,
@@ -131,7 +133,6 @@ class QuestionVoteDetailsAPIView(RetrieveUpdateDestroyAPIView):
 
 
 class AnswersAPIView(ListCreateAPIView):
-    ordering = ["-is_accepted", "-rating", "-posted"]
     permission_classes = [IsAuthenticatedOrReadOnly]
     serializer_class = AnswerSerializer
 
@@ -145,22 +146,41 @@ class AnswersAPIView(ListCreateAPIView):
     def get_queryset(self):
         queryset = Answer.objects.all()
         queryset = queryset.filter(question=self.question)
-
+        queryset = queryset.order_by("-is_accepted", "-rating", "-posted")
         return queryset
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user, question=self.question)
 
 
-class AnswerDetailsAPIView(RetrieveAPIView):
-    permission_classes = [IsAuthenticatedOrReadOnly]
-    serializer_class = AnswerSerializer
+class AnswerDetailsAPIView(RetrieveUpdateAPIView):
+    http_method_names = ["get", "patch", "head", "options"]
+    permission_classes = [
+        IsAuthenticatedOrReadOnly,
+        IsOwnerOfQuestionOrReadOnly,
+    ]
+    serializer_class = AnswerDetailSerializer
 
     def get_queryset(self):
         queryset = Answer.objects.all()
         queryset = queryset.select_related("author")
 
         return queryset
+
+    def perform_update(self, serializer):
+        """ Mark / unmark answer as accepted one
+        """
+        answer = serializer.instance
+        is_accepted_new = serializer.validated_data["is_accepted"]
+
+        # Do nothing if `is_accepted` is not changed
+        if answer.is_accepted == is_accepted_new:
+            return
+
+        if is_accepted_new:
+            answer.mark()
+        else:
+            answer.unmark()
 
 
 class AnswerVotesAPIView(ListCreateAPIView):

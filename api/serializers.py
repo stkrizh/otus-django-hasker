@@ -73,6 +73,22 @@ class AnswerSerializer(serializers.ModelSerializer):
         ]
 
 
+class AnswerDetailSerializer(serializers.ModelSerializer):
+    author = UserSerializer(read_only=True)
+
+    class Meta:
+        model = Answer
+        fields = "__all__"
+        read_only_fields = [
+            "author",
+            "content",
+            "number_of_votes",
+            "posted",
+            "question",
+            "rating",
+        ]
+
+
 class AnswerVoteSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
 
