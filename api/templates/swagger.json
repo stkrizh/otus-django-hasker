@@ -1,0 +1,907 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Hasker API",
+    "version": "v1",
+    "description": "Currently two authentication schemes are supporting: Django's default session backend for authentication and simple token-based HTTP Authentication scheme. To get API token go to `token` section."
+  },
+  "host": "{{ request.get_host }}",
+  "schemes": [
+    {% if debug %}"http"{% else %}"https"{% endif %}
+  ],
+  "basePath": "/api/v1",
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "securityDefinitions": {
+    "api_key": {
+      "description": "This authentication scheme uses a simple token-based HTTP Authentication scheme. Example: Token 9944b09199c62bcf9418ad846dd0e4bbdfc6ee4b",
+      "in": "header",
+      "name": "Authorization",
+      "type": "apiKey"
+    }
+  },
+  "security": [
+    {
+      "api_key": []
+    }
+  ],
+  "paths": {
+    "/answers/{answer_pk}/votes/{id}": {
+      "get": {
+        "operationId": "answers_votes_read",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/AnswerVote"
+            }
+          }
+        },
+        "tags": [
+          "answers"
+        ]
+      },
+      "patch": {
+        "operationId": "answers_votes_partial_update",
+        "description": "Change vote for the answer. Only owner of the vote is allowed.",
+        "parameters": [
+          {
+            "name": "data",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AnswerVote"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/AnswerVote"
+            }
+          }
+        },
+        "tags": [
+          "answers"
+        ]
+      },
+      "delete": {
+        "operationId": "answers_votes_delete",
+        "description": "Delete vote for the answer. Only owner of the vote is allowed.",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "answers"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "answer_pk",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        }
+      ]
+    },
+    "/answers/{id}": {
+      "get": {
+        "operationId": "answers_read",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/AnswerDetail"
+            }
+          }
+        },
+        "tags": [
+          "answers"
+        ]
+      },
+      "patch": {
+        "operationId": "answers_partial_update",
+        "description": "Mark / unmark the answer as accepted one. Only owner of the answer's question is allowed.",
+        "parameters": [
+          {
+            "name": "data",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AnswerDetail"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/AnswerDetail"
+            }
+          }
+        },
+        "tags": [
+          "answers"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        }
+      ]
+    },
+    "/answers/{id}/votes": {
+      "get": {
+        "operationId": "answers_votes_list",
+        "description": "",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "A page number within the paginated result set.",
+            "required": false,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "required": [
+                "count",
+                "results"
+              ],
+              "type": "object",
+              "properties": {
+                "count": {
+                  "type": "integer"
+                },
+                "next": {
+                  "type": "string",
+                  "format": "uri",
+                  "x-nullable": true
+                },
+                "previous": {
+                  "type": "string",
+                  "format": "uri",
+                  "x-nullable": true
+                },
+                "results": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/AnswerVote"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "answers"
+        ]
+      },
+      "post": {
+        "operationId": "answers_votes_create",
+        "description": "",
+        "parameters": [
+          {
+            "name": "data",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AnswerVote"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/AnswerVote"
+            }
+          }
+        },
+        "tags": [
+          "answers"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        }
+      ]
+    },
+    "/questions": {
+      "get": {
+        "operationId": "questions_list",
+        "description": "",
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "description": "A search term.",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "tag",
+            "in": "query",
+            "description": "Filter questions by tag.",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "A page number within the paginated result set.",
+            "required": false,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "required": [
+                "count",
+                "results"
+              ],
+              "type": "object",
+              "properties": {
+                "count": {
+                  "type": "integer"
+                },
+                "next": {
+                  "type": "string",
+                  "format": "uri",
+                  "x-nullable": true
+                },
+                "previous": {
+                  "type": "string",
+                  "format": "uri",
+                  "x-nullable": true
+                },
+                "results": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Question"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "questions"
+        ]
+      },
+      "post": {
+        "operationId": "questions_create",
+        "description": "Post new question",
+        "parameters": [
+          {
+            "name": "data",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Question"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/Question"
+            }
+          }
+        },
+        "tags": [
+          "questions"
+        ]
+      },
+      "parameters": []
+    },
+    "/questions/{id}": {
+      "get": {
+        "operationId": "questions_read",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/Question"
+            }
+          }
+        },
+        "tags": [
+          "questions"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        }
+      ]
+    },
+    "/questions/{id}/answers": {
+      "get": {
+        "operationId": "questions_answers_list",
+        "description": "",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "A page number within the paginated result set.",
+            "required": false,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "required": [
+                "count",
+                "results"
+              ],
+              "type": "object",
+              "properties": {
+                "count": {
+                  "type": "integer"
+                },
+                "next": {
+                  "type": "string",
+                  "format": "uri",
+                  "x-nullable": true
+                },
+                "previous": {
+                  "type": "string",
+                  "format": "uri",
+                  "x-nullable": true
+                },
+                "results": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Answer"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "questions"
+        ]
+      },
+      "post": {
+        "operationId": "questions_answers_create",
+        "description": "Post new answer for specified question.",
+        "parameters": [
+          {
+            "name": "data",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Answer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/Answer"
+            }
+          }
+        },
+        "tags": [
+          "questions"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        }
+      ]
+    },
+    "/questions/{id}/votes": {
+      "get": {
+        "operationId": "questions_votes_list",
+        "description": "",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "A page number within the paginated result set.",
+            "required": false,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "required": [
+                "count",
+                "results"
+              ],
+              "type": "object",
+              "properties": {
+                "count": {
+                  "type": "integer"
+                },
+                "next": {
+                  "type": "string",
+                  "format": "uri",
+                  "x-nullable": true
+                },
+                "previous": {
+                  "type": "string",
+                  "format": "uri",
+                  "x-nullable": true
+                },
+                "results": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/QuestionVote"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "questions"
+        ]
+      },
+      "post": {
+        "operationId": "questions_votes_create",
+        "description": "Vote Up / Down for specified question.",
+        "parameters": [
+          {
+            "name": "data",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/QuestionVote"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/QuestionVote"
+            }
+          }
+        },
+        "tags": [
+          "questions"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        }
+      ]
+    },
+    "/questions/{question_pk}/votes/{id}": {
+      "get": {
+        "operationId": "questions_votes_read",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/QuestionVote"
+            }
+          }
+        },
+        "tags": [
+          "questions"
+        ]
+      },
+      "patch": {
+        "operationId": "questions_votes_partial_update",
+        "description": "Change vote for specified question. Only owner of the vote is allowed.",
+        "parameters": [
+          {
+            "name": "data",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/QuestionVote"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/QuestionVote"
+            }
+          }
+        },
+        "tags": [
+          "questions"
+        ]
+      },
+      "delete": {
+        "operationId": "questions_votes_delete",
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "questions"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "name": "question_pk",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        }
+      ]
+    },
+    "/token": {
+      "post": {
+        "operationId": "token_create",
+        "description": "",
+        "parameters": [
+          {
+            "name": "data",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "username": {
+                  "title": "Username",
+                  "type": "string"
+                },
+                "password": {
+                  "title": "Password",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "token"
+        ]
+      },
+      "parameters": []
+    }
+  },
+  "definitions": {
+    "User": {
+      "title": "User",
+      "required": [],
+      "type": "object",
+      "properties": {
+        "id": {
+          "title": "ID",
+          "type": "integer",
+          "readOnly": true
+        },
+        "username": {
+          "title": "Username",
+          "description": "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.",
+          "type": "string",
+          "pattern": "^[\\w.@+-]+$",
+          "maxLength": 150,
+          "minLength": 1,
+          "readOnly": true
+        },
+        "photo_big_url": {
+          "title": "Photo big url",
+          "type": "string",
+          "readOnly": true
+        },
+        "photo_small_url": {
+          "title": "Photo small url",
+          "type": "string",
+          "readOnly": true
+        }
+      }
+    },
+    "AnswerVote": {
+      "required": [
+        "value"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "title": "ID",
+          "type": "integer",
+          "readOnly": true
+        },
+        "user": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/User"
+            },
+            {
+              "readOnly": true
+            }
+          ]
+        },
+        "timestamp": {
+          "title": "Timestamp",
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true
+        },
+        "value": {
+          "title": "Value",
+          "type": "integer",
+          "enum": [
+            1,
+            -1
+          ]
+        }
+      }
+    },
+    "AnswerDetail": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "title": "ID",
+          "type": "integer",
+          "readOnly": true
+        },
+        "author": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/User"
+            },
+            {
+              "readOnly": true
+            }
+          ]
+        },
+        "content": {
+          "title": "Content",
+          "type": "string",
+          "readOnly": true,
+          "minLength": 1
+        },
+        "posted": {
+          "title": "Posted",
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true
+        },
+        "rating": {
+          "title": "Rating",
+          "type": "integer",
+          "readOnly": true
+        },
+        "number_of_votes": {
+          "title": "Number of votes",
+          "type": "integer",
+          "readOnly": true
+        },
+        "is_accepted": {
+          "title": "Is accepted",
+          "type": "boolean"
+        },
+        "question": {
+          "title": "Question",
+          "type": "integer",
+          "readOnly": true
+        }
+      }
+    },
+    "Question": {
+      "required": [
+        "tags",
+        "content",
+        "title"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "title": "ID",
+          "type": "integer",
+          "readOnly": true
+        },
+        "author": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/User"
+            },
+            {
+              "readOnly": true
+            }
+          ]
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 1
+          },
+          "maxItems": 3
+        },
+        "content": {
+          "title": "Content",
+          "type": "string",
+          "minLength": 1
+        },
+        "posted": {
+          "title": "Posted",
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true
+        },
+        "rating": {
+          "title": "Rating",
+          "type": "integer",
+          "readOnly": true
+        },
+        "number_of_votes": {
+          "title": "Number of votes",
+          "type": "integer",
+          "readOnly": true
+        },
+        "number_of_answers": {
+          "title": "Number of answers",
+          "type": "integer",
+          "readOnly": true
+        },
+        "title": {
+          "title": "Title",
+          "type": "string",
+          "maxLength": 255,
+          "minLength": 1
+        }
+      }
+    },
+    "Answer": {
+      "required": [
+        "content"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "title": "ID",
+          "type": "integer",
+          "readOnly": true
+        },
+        "author": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/User"
+            },
+            {
+              "readOnly": true
+            }
+          ]
+        },
+        "content": {
+          "title": "Content",
+          "type": "string",
+          "minLength": 1
+        },
+        "posted": {
+          "title": "Posted",
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true
+        },
+        "rating": {
+          "title": "Rating",
+          "type": "integer",
+          "readOnly": true
+        },
+        "number_of_votes": {
+          "title": "Number of votes",
+          "type": "integer",
+          "readOnly": true
+        },
+        "is_accepted": {
+          "title": "Is accepted",
+          "type": "boolean",
+          "readOnly": true
+        },
+        "question": {
+          "title": "Question",
+          "type": "integer",
+          "readOnly": true
+        }
+      }
+    },
+    "QuestionVote": {
+      "required": [
+        "value"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "title": "ID",
+          "type": "integer",
+          "readOnly": true
+        },
+        "user": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/User"
+            },
+            {
+              "readOnly": true
+            }
+          ]
+        },
+        "timestamp": {
+          "title": "Timestamp",
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true
+        },
+        "value": {
+          "title": "Value",
+          "type": "integer",
+          "enum": [
+            1,
+            -1
+          ]
+        }
+      }
+    }
+  }
+}
