@@ -4,9 +4,13 @@ Poor Man's Stackoverflow
 ### Live version
 https://hasker.pythonanywhere.com/
 
+### API documentation
+https://hasker.pythonanywhere.com/api/v1/swagger-ui/
+
 ### Requirements
 - Python (3.6+)
 - Django (2.2+)
+- Django REST framework (3.10+)
 
 ### Development environment installation
 
