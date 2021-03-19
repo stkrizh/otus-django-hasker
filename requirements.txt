@@ -1,4 +1,4 @@
 django==2.2.4
-djangorestframework==3.10.3
+djangorestframework==3.11.2
 django-sendgrid-v5==0.8.0
 Pillow==6.1.0
